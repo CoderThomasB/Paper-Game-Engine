@@ -4,7 +4,7 @@ class location2D {
 		this.x = x
 		this.y = y
 	}
-	
+
 	is_equal(other) {
 		return other.x == this.x && other.y == this.y
 	}
@@ -190,10 +190,12 @@ class basce {
 	damage() { }
 
 	scail = new location2D(1, 1)
-	constructor(w) {
+	constructor(New_world, New_location) {
 		var me = this
 		try {
-			if (w.constructor == world) {
+
+			// this is the old code
+			/*if (w.constructor == world) {
 				Object.keys(w.setings.default[me.constructor.name]).forEach(function (key) {
 					if (typeof (w.setings.default[me.constructor.name][key]) == typeof ("")) {
 						var m = "me." + key + " = '" + w.setings.default[me.constructor.name][key] + "'"
@@ -203,18 +205,18 @@ class basce {
 					console.log(m)
 					eval(m)
 				})
-			}
+			}*/
 
 
 
-			this.this_world = w
+			this.this_world = New_world
 			this.this_world.grid.push(this)
 
-
+			this.location = New_location
 
 
 		} catch (e) {
-
+			console.log(e)
 
 		}
 	}
@@ -235,9 +237,8 @@ class physics extends visible {
 		colour_or_img: true,
 		colour: "hsl(0, 0%, 80%)"
 	}
-	constructor(w, location) {
-		super(w)
-		this.location = location
+	constructor(New_world, New_location) {
+		super(New_world, New_location)
 
 	}
 }
@@ -254,6 +255,7 @@ class camera extends basce {
 		var by = ys / ctx.size.y
 		var bx = xs / ctx.size.x
 
+		ctx_reder.clearRect(0, 0, xs, ys)
 
 		var draw_elmint = function (c_block) {
 
@@ -275,8 +277,9 @@ class camera extends basce {
 			}
 		})
 	}
-	constructor(w, ctx) {
-		super(w)
+	
+	constructor(New_world, New_location, ctx) {
+		super(New_world, New_location)
 		this.ctx = ctx
 
 	}

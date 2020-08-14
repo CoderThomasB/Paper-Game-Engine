@@ -1,6 +1,23 @@
-<canvas  id="match" style="width: 500px; 500px; border: 1px solid; margin: auto; float: right;" width="500" height="500" ></canvas>
-<script type="text/javascript" src="main.js"></script>
-<script>
-	The_world = new world()
-	The_camera = new camera(The_world, document.getElementsByTagName("canvas")[0])
-</script>
+<!DOCTYPE html>
+<html>
+
+<body>
+	<canvas id="match" style="width: 500px; 500px; border: 1px solid; margin: auto; float: right;" width="500"
+		height="500"></canvas>
+	<script type="text/javascript" src="main.js"></script>
+	<script>
+		The_world = new world()
+		The_camera = new camera(The_world, new location2D(0, 0), document.getElementsByTagName("canvas")[0])
+
+		The_Test = new visible(The_world, new location2D(1, 1))
+
+		function Test() {
+			The_camera.draw()
+		}
+
+		draw = setInterval(Test, 10)
+
+	</script>
+</body>
+
+</html>
