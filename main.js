@@ -153,10 +153,10 @@ class camera extends base {
 		})
 	}
 	
-	constructor(New_world, New_location, ctx) {
+	constructor(New_world, New_location, ctx, screen_size) {
 		super(New_world, New_location)
 		this.ctx = ctx
-
+		this.ctx.size = screen_size
 	}
 }
 
