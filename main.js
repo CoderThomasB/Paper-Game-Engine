@@ -19,90 +19,16 @@ class location2D {
 
 
 class world {
-	//grid = []
+	grid = []
+	update_number = 0
 
-	/*setings = {
-		default: {
-			block: {
-				solid: true,
-				colour_or_img: true,
-				colour: "hsl(0, 0%, 80%)",
-			},
-			master: {
-				solid: true,
-				colour_or_img: true,
-				colour: "hsl(0, 0%, 80%)",
-				
-				
-			}
-		}
-		
-	}*/
-	//size = new location2D(4,4)
-	draw() {
-		//console.log(this)
-		var c = this.ctx //document.getElementById("match")
-		var ctx = c.getContext("2d")
-		var xs = c.width
-		var ys = c.height
-		var by = ys / this.ctx.size.y
-		var bx = xs / this.ctx.size.x
-
-
-		var temp_f = function (c_block) {
-			var x = c_block.location.x
-			var y = c_block.location.y
-			//console.log(c_block.location)
-			if (c_block.colour_or_img) {
-				//console.log("colour")	
-				ctx.fillStyle = c_block.colour
-				ctx.fillRect(x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)
-			} else {
-				//console.log("img")	
-				ctx.drawImage(c_block.img, x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)
-
-			}
-		}
-
-		this.grid.forEach(function (c_block) {
-			//console.group(c_block)
-			var temp_f = function (c_block) {
-
-
-				var temp = []
-				if (c_block.constructor == temp.constructor) {
-					c_block.forEach(function (c_block) {
-						temp_f(c_block)
-					})
-				} else {
-					var x = c_block.location.x
-					var y = c_block.location.y
-					//console.log(c_block.location)
-					if (c_block.colour_or_img) {
-						//console.log("colour")	
-						ctx.fillStyle = c_block.colour
-						ctx.fillRect(x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)
-					} else {
-						//console.log("img")	
-						ctx.drawImage(c_block.img, x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)
-
-					}
-
-				}
-			}
-			temp_f(c_block)
-			//console.groupEnd()
-		})
-		//console.groupEnd()
-	}
 	update() {
 		var me = this
 		me.grid.forEach(function (c_block) {
 			c_block.update(me.updateNO)
 
 		})
-		me.draw()
-		me.updateNO++
+		me.update_number++
 	}
 	start() {
 
@@ -139,50 +65,8 @@ class world {
 		})
 		return b
 	}
-	fast_update(world) {
-		//console.log(world)
-		//console.log(world.ctx.full_sqwer)
-		if (world.ctx.full_sqwer) {
-			if (window.innerWidth > window.innerHeight) {
-
-				world.ctx.style.width = window.innerHeight - (parseInt(world.ctx.style.borderLeftWidth) + parseInt(world.ctx.style.borderRightWidth)).toString() + "px"
-				world.ctx.style.height = window.innerHeight - (parseInt(world.ctx.style.borderBottomWidth) + parseInt(world.ctx.style.borderTopWidth)).toString() + "px"
-
-				world.width_px = window.innerHeight
-				world.height_px = window.innerHeight
-			} else {
-
-				world.ctx.style.width = window.innerWidth - (parseInt(world.ctx.style.borderLeftWidth) + parseInt(world.ctx.style.borderRightWidth)).toString() + "px"
-				world.ctx.style.height = window.innerWidth - (parseInt(world.ctx.style.borderBottomWidth) + parseInt(world.ctx.style.borderTopWidth)).toString() + "px"
-
-				world.width_px = window.innerWidth
-				world.height_px = window.innerWidth
-			}
-
-		}
-
-
-	}
-	constructor(screen_size = new location2D(10, 10)) {
-
-
-		this.grid = []
-		this.updateNO = 0
-
-
-
-		this.ctx = document.getElementsByTagName("canvas")[0]
-		this.ctx.size = screen_size
-		this.fast_update_o = setInterval(this.fast_update, 10, this)
-		this.ctx.full_sqwer = false
-		//this.ctx.getContext("2d").clearRect(0, 0, this.ctx.width, this.ctx.height);
-		//this.update_timer = setInterval(this.update, 10)
-
-
-
-
-		//this.start()
-	}
+	
+	
 }
 class basce {
 	start() { }
@@ -230,17 +114,8 @@ class visible extends basce {
 class physics extends visible {
 	physics = {
 		solid: true
-
 	}
-	location = undefined
-	visible = {
-		colour_or_img: true,
-		colour: "hsl(0, 0%, 80%)"
-	}
-	constructor(New_world, New_location) {
-		super(New_world, New_location)
-
-	}
+	
 }
 
 class camera extends basce {
