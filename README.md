@@ -2,7 +2,7 @@
 ## This is an unfinished Game Engine!
 
 Paper is a basic game engine
-
+v1.0.0
 ### documentation:
 #### world:
 ```javascript
