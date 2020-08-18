@@ -68,7 +68,7 @@ class world {
 	
 	
 }
-class basce {
+class base {
 	start() { }
 	update(x) { }
 	damage() { }
@@ -105,7 +105,7 @@ class basce {
 		}
 	}
 }
-class visible extends basce {
+class visible extends base {
 	visible = {
 		colour_or_img: true,
 		colour: "hsl(0, 0%, 80%)"
@@ -118,7 +118,7 @@ class physics extends visible {
 	
 }
 
-class camera extends basce {
+class camera extends base {
 	ctx = undefined
 	update(x) { }
 	draw() {
