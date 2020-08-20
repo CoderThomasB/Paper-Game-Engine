@@ -125,22 +125,10 @@ class physics extends visible {
 		solid: true
 	}
 	move (direction){
-		switch(direction){
-			case directions.up:
-				this.location.y += -1
-				break
-			case directions.down:
-				this.location.y += 1
-				break
-			case directions.left:
-				this.location.x += -1
-				break
-			case directions.right:
-				this.location.x += 1
-				break
-		}
+		this.location = this.location.add(get_direction_as_location2D(direction))
 		if(!check(this.location, this.this_world, this)){
 			console.log("INVALID MOVE")
+			this.move(get_opposite_direction(direction))
 		}
 		this.this_world.update()
 	}
@@ -148,20 +136,39 @@ class physics extends visible {
 }
 
 function get_opposite_direction(direction){
-		switch(direction){
-				case directions.up:
-					return directions.down
-					break
-				case directions.down:
-					return directions.up
-					break
-				case directions.left:
-					return directions.right
-					break
-				case directions.right:
-					return directions.left
-					break
-	}}
+	switch(direction){
+		case directions.up:
+			return directions.down
+			break
+		case directions.down:
+			return directions.up
+			break
+		case directions.left:
+			return directions.right
+			break
+		case directions.right:
+			return directions.left
+			break
+	}
+}
+function get_direction_as_location2D(direction){
+	switch(direction){
+		case directions.up:
+			return new location2D(0, -1)
+			break
+		case directions.down:
+			return new location2D(0, 1)
+			break
+		case directions.left:
+			return new location2D(-1, 0)
+			break
+		case directions.right:
+			return new location2D(1, 0)
+			break
+	}
+}
+
+
 
 class camera extends base {
 	ctx = undefined
