@@ -19,8 +19,9 @@ class location2D {
 
 
 class world {
-	grid = []
-	update_number = 0
+	grid = [] // a list with all the objects in it
+	update_number = 0 // the number of updates that have happened
+	size = undefined // if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'
 
 	update() {
 		var me = this
@@ -72,8 +73,16 @@ class base {
 	start() { }
 	update(x) { }
 	damage() { }
+	destroy() {
+		this.this_world.grid.splice(this.this_world.get_in_grid(this),1)
+		this.this_world = undefined
+	}
+
 
 	scail = new location2D(1, 1)
+	this_world = null
+	location = null
+	
 	constructor(New_world, New_location) {
 		var me = this
 		try {
@@ -115,8 +124,44 @@ class physics extends visible {
 	physics = {
 		solid: true
 	}
+	move (direction){
+		switch(direction){
+			case directions.up:
+				this.location.y += -1
+				break
+			case directions.down:
+				this.location.y += 1
+				break
+			case directions.left:
+				this.location.x += -1
+				break
+			case directions.right:
+				this.location.x += 1
+				break
+		}
+		if(!check(this.location, this.this_world, this)){
+			console.log("INVALID MOVE")
+		}
+		this.this_world.update()
+	}
 	
 }
+
+function get_opposite_direction(direction){
+		switch(direction){
+				case directions.up:
+					return directions.down
+					break
+				case directions.down:
+					return directions.up
+					break
+				case directions.left:
+					return directions.right
+					break
+				case directions.right:
+					return directions.left
+					break
+	}}
 
 class camera extends base {
 	ctx = undefined
@@ -138,7 +183,7 @@ class camera extends base {
 			var y = c_block.location.y
 			if (c_block.visible.colour_or_img) {
 
-				ctx_reder.fillStyle = c_block.colour //select color
+				ctx_reder.fillStyle = c_block.visible.colour //select color
 				ctx_reder.fillRect(x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y) //fill color
 			} else {
 				ctx_reder.drawImage(c_block.img, x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)// display img
@@ -158,6 +203,36 @@ class camera extends base {
 		this.ctx = ctx
 		this.ctx.size = screen_size
 	}
+}
+
+
+
+// true is valid and false is invalid
+// self_ is the objets self used to not detet it self
+function check(location, The_world, self_){
+	is = true
+	is = check_out_of_world(location, The_world) && is
+	is = check_is_in_solid(location, The_world, self_) && is
+	return is
+}
+function check_out_of_world(location, The_world){
+	if(The_world.size == undefined){
+		return true
+	}
+	is_out_of_world = 
+		((location.x < The_world.size.x 
+		&&
+		location.y < The_world.size.y
+		) || 
+		(location.x < 0 && location.y < 0))
+	return is_out_of_world
+}
+function check_is_in_solid(location, The_world, self_){
+	is_in_solid = false
+	The_world.get_at_location(location, self_).forEach(function (Thing) {
+		is_in_solid = Thing.physics.solid || is_in_solid
+	})
+	return !is_in_solid
 }
 
 
@@ -184,7 +259,6 @@ class rotashon2D {
 	}
 	mack_copy() {
 		return new location2D(this.z)
-
 	}
 	in_degrs() {
 		return this.z
