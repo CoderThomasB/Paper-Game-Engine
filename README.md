@@ -1,8 +1,8 @@
 # The Paper Game-Engine
 ## This is an unfinished Game Engine!
 
-Paper is a basic game engine
-v1.0.0
+Paper is a basic game engine dezized for gride based games
+
 ### documentation:
 #### world:
 ```javascript
