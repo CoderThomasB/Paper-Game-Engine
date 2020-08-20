@@ -10,6 +10,7 @@ The_world = new world() // creates a new world
 
 
 The_world.grid // a list with all the objects in it
+The_world.grid // you can use this to set a size limit on your world
 
 The_world.update() // runs all the update functions in all the grid objects and adds one to the update_number
 The_world.update_number // the number of updates that have happened
