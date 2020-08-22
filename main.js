@@ -66,20 +66,20 @@ class world {
 		})
 		return b
 	}
-	
+	constructor(){
+		
+	}
 	
 }
 class base {
 	start() { }
 	update(x) { }
-	damage() { }
+	damage(amount) { }
 	destroy() {
 		this.this_world.grid.splice(this.this_world.get_in_grid(this),1)
 		this.this_world = undefined
 	}
 
-
-	scail = new location2D(1, 1)
 	this_world = null
 	location = null
 	
@@ -117,6 +117,7 @@ class base {
 class visible extends base {
 	visible = {
 		colour_or_img: true,
+		scail = new location2D(1, 1),
 		colour: "hsl(0, 0%, 80%)"
 	}
 }
@@ -180,7 +181,12 @@ class DirectionTypeError extends TypeError{
 
 class camera extends base {
 	ctx = undefined
-	update(x) { }
+	draw_on_update = false
+	update(x) {
+		if(this.draw_on_update){
+			this.draw()
+		}
+	}
 	draw() {
 
 		var ctx = this.ctx //define stuff
@@ -199,9 +205,9 @@ class camera extends base {
 			if (c_block.visible.colour_or_img) {
 
 				ctx_reder.fillStyle = c_block.visible.colour //select color
-				ctx_reder.fillRect(x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y) //fill color
+				ctx_reder.fillRect(x * bx, y * by, bx * c_block.visible.scail.x, by * c_block.visible.scail.y) //fill color
 			} else {
-				ctx_reder.drawImage(c_block.visible.img, x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)// display img
+				ctx_reder.drawImage(c_block.visible.img, x * bx, y * by, bx * c_block.visible.scail.x, by * c_block.visible.scail.y)// display img
 			}
 		}
 
@@ -212,10 +218,11 @@ class camera extends base {
 		})
 	}
 	
-	constructor(New_world, New_location, ctx, screen_size) {
+	constructor(New_world, New_location, ctx, screen_size, draw_on_update = false) {
 		super(New_world, New_location)
 		this.ctx = ctx
 		this.ctx.size = screen_size
+		this.draw_on_update = draw_on_update
 	}
 }
 
