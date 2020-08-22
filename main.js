@@ -149,6 +149,9 @@ function get_opposite_direction(direction){
 		case directions.right:
 			return directions.left
 			break
+		default:
+			throw new DirectionTypeError()
+			break
 	}
 }
 function get_direction_as_location2D(direction){
@@ -165,9 +168,14 @@ function get_direction_as_location2D(direction){
 		case directions.right:
 			return new location2D(1, 0)
 			break
+		default:
+			throw new DirectionTypeError()
+			break
 	}
 }
-
+class DirectionTypeError extends TypeError{
+	message = "Input is not a direction!"
+}
 
 
 class camera extends base {
@@ -193,7 +201,7 @@ class camera extends base {
 				ctx_reder.fillStyle = c_block.visible.colour //select color
 				ctx_reder.fillRect(x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y) //fill color
 			} else {
-				ctx_reder.drawImage(c_block.img, x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)// display img
+				ctx_reder.drawImage(c_block.visible.img, x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)// display img
 
 			}
 		}
