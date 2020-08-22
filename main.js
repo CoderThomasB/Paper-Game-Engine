@@ -202,7 +202,6 @@ class camera extends base {
 				ctx_reder.fillRect(x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y) //fill color
 			} else {
 				ctx_reder.drawImage(c_block.visible.img, x * bx, y * by, bx * c_block.scail.x, by * c_block.scail.y)// display img
-
 			}
 		}
 
@@ -245,7 +244,9 @@ function check_out_of_world(location, The_world){
 function check_is_in_solid(location, The_world, self_){
 	is_in_solid = false
 	The_world.get_at_location(location, self_).forEach(function (Thing) {
-		is_in_solid = Thing.physics.solid || is_in_solid
+		if(Thing.physics != undefined){
+			is_in_solid = Thing.physics.solid || is_in_solid
+		}
 	})
 	return !is_in_solid
 }
