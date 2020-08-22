@@ -59,6 +59,8 @@ The_visible.visible.img	           // if colour_or_img is false then this is the
 The_visible.visible.img = document.getElementById("img")
 The_visible.visible.scail	   // the size or scail of an object
 
+The_visible.before_draw()	   // a function that is called before it is drawn
+
 ```
 
 #### camera:

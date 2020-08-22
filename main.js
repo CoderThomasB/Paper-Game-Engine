@@ -120,6 +120,9 @@ class visible extends base {
 		scail: new location2D(1, 1),
 		colour: "hsl(0, 0%, 80%)"
 	}
+	before_draw(){
+
+	}
 }
 class physics extends visible {
 	physics = {
@@ -202,6 +205,11 @@ class camera extends base {
 
 			var x = c_block.location.x
 			var y = c_block.location.y
+			try{
+				c_block.before_draw()
+			}catch(error){
+				console.error(error)
+			}
 			if (c_block.visible.colour_or_img) {
 
 				ctx_reder.fillStyle = c_block.visible.colour //select color
