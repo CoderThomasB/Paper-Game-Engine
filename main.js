@@ -117,7 +117,7 @@ class base {
 class visible extends base {
 	visible = {
 		colour_or_img: true,
-		scail = new location2D(1, 1),
+		scail: new location2D(1, 1),
 		colour: "hsl(0, 0%, 80%)"
 	}
 }
