@@ -244,8 +244,8 @@ function check_out_of_world(location, The_world){
 		((location.x < The_world.size.x 
 		&&
 		location.y < The_world.size.y
-		) || 
-		(location.x < 0 && location.y < 0))
+		) && 
+		(location.x >= 0 && location.y >= 0))
 	return is_out_of_world
 }
 function check_is_in_solid(location, The_world, self_){
