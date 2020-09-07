@@ -90,7 +90,7 @@ draw = setInterval(Draw, 10) // this can be a good way to do live updating
 #### physics:
 physics is an extension on visible it allows the object to have basic physics attributes and be solid
 
-##### NOT FULLY WORKING
+##### NOT FULLY WORKING ( only basic collisions)
 ```javascript
 The_world = new world() // creates a new world
 
