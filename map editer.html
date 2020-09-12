@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+		<img src="/Cell Man/wall.svg" style="display: none;" id="img wall">
+		<img src="/Cell Man/wall flipped.svg" style="display: none;" id="img wall flipped">
+		<img src="/Cell Man/Wall End Up.svg" style="display: none;" id="img wall end up">
+		<img src="/Cell Man/Wall End Down.svg" style="display: none;" id="img wall end down">
+		<img src="/Cell Man/Wall End Left.svg" style="display: none;" id="img wall end left">
+		<img src="/Cell Man/Wall End Right.svg" style="display: none;" id="img wall end right">
+
+		<img src="/Cell Man/PacMan.svg" style="display: none;" id="img PacMan">
+		<img src="/Cell Man/CellMan.svg" style="display: none;" id="img CellMan">
+		<img src="/Cell Man/CellMan Eat.svg" style="display: none;" id="img CellMan Eat">
+		<img src="/Cell Man/CellMan Eating.svg" style="display: none;" id="img CellMan Eating">
+		<img src="/Cell Man/Food.svg" style="display: none;" id="img Food">
+	<canvas id="match" style="width: 500px; 500px; border: 1px solid; margin: auto; float: right;" width="500"
+		height="500"></canvas>
+		
+	<div id ="The_new_div" style="
+		margin: 10px;
+		padding: 10px;
+		background-color: hsla(0, 0%, 0%, 0.1);
+		width: max-content;
+		border-radius: 10px;
+	">
+	<button style="float: left; margin-right: 1em;" id="The_new_div_button">new</button>
+	<textarea id="The_new_div_textarea" cols="40" rows="1">physics(The_world, new location2D(1,1))</textarea>
+	</div>
+	<ul id="object propertys" style="
+    	list-style: none;
+    	margin: 0px;
+		padding: 0px;
+		float: right;
+	">
+	</ul>
+	<button id="Button_select_object"
+	style="
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 10px;
+	margin: 10px;
+	padding: 10px;">
+		select an object
+		<script>
+			The_Button_select_object = document.getElementById("Button_select_object")
+
+			The_Button_select_object.addEventListener("click", (event1) => {
+				console.log(event1.target)
+				event1.target.disabled = true
+				The_select.this_world = The_world
+				The_world.grid.push(The_select)
+				let mousemove = The_canvas.addEventListener("mousemove", update_The_select)
+				The_canvas.addEventListener("click", (event2) => {
+					The_canvas.removeEventListener("mousemove", update_The_select)
+					The_select.destroy()
+					The_location = new location2D(0,0)
+					The_location.x = Math.floor(event.offsetX / The_canvas.clientWidth * The_camera.screen_size.x)
+					The_location.y = Math.floor(event2.offsetY / The_canvas.clientHeight * The_camera.screen_size.y)
+					event1.target.disabled = false
+					The_objects = The_world.get_at_location(The_location)
+					if(The_objects.length >= 1){
+						show_propertys(The_world.get_at_location(The_location)[0])
+					}
+				}, {once : true})
+			})
+		</script>
+	</button>
+	<ul id="grid list" style="
+		list-style: none;
+		margin: 0px;
+		padding: 0px;
+	">
+		<li>The_world (world)</li>
+		<li>The_camera (camera)</li>
+		<li>The_Test (visible)</li>
+		<li></li>
+	</ul>
+	
+	<script type="text/javascript" src="main.js"></script>
+	<script>
+		class PacMan extends physics {
+				
+
+				set_Eat_img(){
+					this.visible.img = this.imgs.Eat
+					clearTimeout(this.Eating_Timer)
+					var me = this
+					clearTimeout(this.Eat_Timer);
+					clearTimeout(this.Eating_Timer);
+					this.Eat_Timer = setTimeout(function()
+					{
+						me.visible.img = me.imgs.Eating
+					}
+					, 1000
+					);
+					this.Eating_Timer = setTimeout(function()
+					{
+						me.visible.img = me.imgs.Normal
+					}
+					, 10000
+					);
+				}
+
+				update(x) {
+					this.Follow_Camera.location = this.location.add(new location2D(-4, -4))
+
+					var me = this
+					var Things = this.this_world.get_at_location(this.location, this)
+					Things.forEach(function (Thing) {
+						if(Thing.constructor == Food){
+							console.log("Nommmm")
+							me.set_Eat_img()
+							me.stuff_eten += 1
+							Thing.destroy()
+						}
+					})
+					
+				}
+				constructor(The_world, location, The_Follow_Camera){
+					super(The_world, location)
+					//console.log(this.visible.img)
+
+					this.stuff_eten = 0
+				
+					this.visible = {
+						colour_or_img: false,
+						colour: "yellow",
+						scail: new location2D(1, 1),
+						img: document.getElementById("img CellMan"),
+					}
+					this.physics = {
+						solid: false
+					}
+					this.imgs = {
+						"Normal": document.getElementById("img CellMan"),
+						"Eat": document.getElementById("img CellMan Eat"),
+						"Eating": document.getElementById("img CellMan Eating"),
+					}
+
+					this.Follow_Camera = The_Follow_Camera
+
+					this.Is_Moving = false
+
+				}
+				
+			}
+			class Wall extends physics {
+				
+				update_imgs(){
+					if(this.is_end){
+						this.visible.img = this.end_imgs[this.direction]
+					}else{
+						this.visible.img = this.not_end_imgs[this.direction]
+					}
+					//this.visible.img = document.getElementById("img Cell Wall")
+				}
+				update(){
+					this.update_imgs()
+				}
+				before_draw(){
+					this.update_imgs()
+				}
+				constructor(The_world, location, is_end = false, direction = directions.left){
+					super(The_world, location)
+					this.direction = direction
+					this.is_end = is_end
+
+					this.visible = {
+						colour_or_img: false,
+						colour: "blue",
+						scail: new location2D(1, 1),
+					}
+					this.physics = {
+						solid: true
+					}
+					this.end_imgs = {
+						1: document.getElementById("img wall end up"),
+						2: document.getElementById("img wall end right"),
+						3: document.getElementById("img wall end down"),
+						4: document.getElementById("img wall end left"),
+					}
+					this.not_end_imgs = {
+						1:document.getElementById("img wall flipped"),
+						2:document.getElementById("img wall"),
+						3:document.getElementById("img wall flipped"),
+						4:document.getElementById("img wall"),
+					}
+
+
+
+					this.update_imgs()
+				}
+				
+			}
+			class Food extends physics {
+				
+				constructor(The_world, location){
+					super(The_world, location)
+
+					this.visible = {
+						colour_or_img: false,
+						colour: "red",
+						scail: new location2D(1, 1),
+						img: document.getElementById("img Food"),
+					}
+					this.physics = {
+						solid: false
+					}
+				}
+			}
+	</script>
+	<script>
+		The_canvas = document.getElementsByTagName("canvas")[0]
+
+		The_world = new world()
+		The_world.size = new location2D(10,10)
+		The_camera = new camera(The_world, new location2D(0, 0), The_canvas, new location2D(10, 10))
+
+		The_Wall = new Wall(The_world, new location2D(1, 1))
+
+		The_select = new visible(The_world, new location2D(1, 1))
+		The_select.destroy()
+
+		The_new_div_textarea = document.getElementById("The_new_div_textarea")
+		The_new_div_button =  document.getElementById("The_new_div_button")
+		The_new_div = document.getElementById("The_new_div")
+		The_grid_list = document.getElementById("grid list")
+		The_object_propertys = document.getElementById("object propertys")
+		
+
+		The_new_div_button.addEventListener("click", (event) => {
+			eval("new " + The_new_div_textarea.value)
+			update_list()
+			show_propertys(The_world.grid[The_world.grid.length - 1])
+		})
+
+		function draw_function() {
+			The_world.update()
+			The_camera.draw()
+			
+		}
+
+		function update_The_select(event){
+			The_select.location.x = Math.floor(event.offsetX / The_canvas.clientWidth * The_camera.screen_size.x)
+			The_select.location.y = Math.floor(event.offsetY / The_canvas.clientHeight * The_camera.screen_size.y)
+		}
+
+		function update_list(){
+			The_grid_list.innerHTML = ""
+			let i = 0
+			The_world.grid.forEach(
+				element => {
+					i++
+					The_li = The_grid_list.appendChild(document.createElement("LI"))
+					The_Button = The_grid_list.appendChild(document.createElement("BUTTON"))
+					The_Button.style.backgroundColor = "hsla(0, 0%, 0%, 0.1)"
+					The_Button.style.borderRadius = "10px"
+					The_Button.style.margin = "10px"
+					//The_Button.style.width = "fit-content"
+					The_Button.style.padding = "10px"
+					if(element.name != undefined && element.name != ""){
+						The_Button.innerHTML = "<li>["+ i +"]" + element.name + "(" + element.constructor.name + ")</li>"
+					}else{
+						The_Button.innerHTML = '<li>['+ i +'] a ' + element.constructor.name + "</li>"
+					}
+					The_Button.addEventListener("click", () => {
+						show_propertys(element)
+					})
+				})
+		}
+		function show_propertys(object) {
+			The_object_propertys.innerHTML = ""
+			Object.keys(object).forEach(
+				key => {
+					value = object[key]
+					The_li = The_object_propertys.appendChild(document.createElement("LI"))
+					The_Div = The_li.appendChild(document.createElement("div"))
+					The_Name = The_Div.appendChild(document.createElement("input"))
+					The_Span = The_Div.appendChild(document.createElement("span"))
+					switch(value.constructor){
+						case Boolean:
+							The_Value = The_Div.appendChild(document.createElement("input"))
+							break
+						default:
+							The_Value = The_Div.appendChild(document.createElement("textarea"))
+							break
+					}
+					The_Div.style.margin = "10px"
+					The_Div.style.padding = "10px"
+					The_Div.style.backgroundColor = "hsla(0, 0%, 0%, 0.1)"
+					The_Div.style.width = "max-content"
+					The_Div.style.borderRadius = "10px"
+					The_Span.innerHTML = " = "
+					The_Span.style.marginLeft = "1em"
+					The_Span.style.marginRight = "1em"
+					The_Name.style.float = "left"
+					The_Span.style.float = "left"
+					switch(value.constructor){
+						case Object:
+							The_Name.value = key
+							The_Value.value = JSON.stringify(value)
+							The_Value.value.replace("{", "{\n")
+							break
+						case Boolean:
+							The_Name.value = key
+							The_Value.type = "checkbox"
+							The_Value.checked = value
+							console.log(The_Value)
+							break
+						case location2D:
+							The_Name.value = key
+							The_Value.value = value
+
+							let The_Button = The_Div.appendChild(document.createElement("button"))
+							The_Button.style.backgroundColor = "hsla(0, 0%, 0%, 0.1)"
+							The_Button.style.borderRadius = "10px"
+							The_Button.style.margin = "10px"
+							The_Button.style.float = "right"
+							The_Button.innerHTML = "selet the location"
+							The_Button.addEventListener("click", (event1) => {
+								console.log(event1.target)
+								event1.target.disabled = true
+								The_select.this_world = The_world
+								The_world.grid.push(The_select)
+								let mousemove = The_canvas.addEventListener("mousemove", update_The_select)
+								The_canvas.addEventListener("click", (event2) => {
+									The_canvas.removeEventListener("mousemove", update_The_select)
+									The_select.destroy()
+									object[key].x = Math.floor(event.offsetX / The_canvas.clientWidth * The_camera.screen_size.x)
+									object[key].y = Math.floor(event2.offsetY / The_canvas.clientHeight * The_camera.screen_size.y)
+									event1.target.disabled = false
+									show_propertys(object)
+								}, {once : true})
+							})
+							break
+						default:
+							The_Name.value = key
+							The_Value.value = value
+							break
+					}
+					The_Name.addEventListener("change", (event) => {
+						Object.defineProperty(object, event.target.value,
+    						Object.getOwnPropertyDescriptor(object, key));
+						delete object[key];
+						show_propertys(object)
+					})
+
+					The_Value.addEventListener("change", (event) => {
+						console.log(typeof(Object.getOwnPropertyDescriptor(object, key).value ))
+						console.log(Object.getOwnPropertyDescriptor(object, key).value.constructor)
+						let The_parse;
+						switch(Object.getOwnPropertyDescriptor(object, key).value.constructor){
+							case Object:
+								console.log(JSON.parse(event.target.value))
+								Object.defineProperty(object, key, {value : JSON.parse(event.target.value)})
+							break
+							case location2D:
+								The_parse = JSON.parse(event.target.value)
+								Object.getOwnPropertyDescriptor(object, key).value.x = The_parse.x
+								Object.getOwnPropertyDescriptor(object, key).value.y = The_parse.y
+							break
+							case Number:
+								Object.defineProperty(object, key, {value : parseInt(event.target.value)})
+								console.log(parseInt(event.target.value))
+							break
+							case Boolean:
+								Object.defineProperty(object, key, {value : event.target.checked})
+								console.log(The_parse)
+						}
+						show_propertys(object)
+					})
+				})
+		}
+
+		
+		
+		draw = setInterval(draw_function, 10)
+		draw_function()
+		update_list()
+	</script>
+</body>
+
+</html>

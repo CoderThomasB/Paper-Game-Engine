@@ -15,13 +15,17 @@ class location2D {
 		return new location2D(this.x, this.y)
 
 	}
+	toString(){
+		return `{"x": ${this.x},"y": ${this.y}}`
+	}
 }
 
 
 class world {
-	grid = [] // a list with all the objects in it
-	update_number = 0 // the number of updates that have happened
-	size = undefined // if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'
+	// Safari dose not do this
+	//grid = [] // a list with all the objects in it
+	//update_number = 0 // the number of updates that have happened
+	//size = undefined // if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'
 
 	update() {
 		var me = this
@@ -67,7 +71,10 @@ class world {
 		return b
 	}
 	constructor(){
-		
+		this.grid = [] // a list with all the objects in it
+		this.update_number = 0 // the number of updates that have happened
+		this.size = undefined // if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'
+
 	}
 	
 }
@@ -80,28 +87,17 @@ class base {
 		this.this_world = undefined
 	}
 
-	this_world = null
-	location = null
+	// Safari dose not do this
+	//this_world = null
+	//location = null
 	
 	constructor(New_world, New_location) {
 		var me = this
 		try {
 
-			// this is the old code
-			/*if (w.constructor == world) {
-				Object.keys(w.setings.default[me.constructor.name]).forEach(function (key) {
-					if (typeof (w.setings.default[me.constructor.name][key]) == typeof ("")) {
-						var m = "me." + key + " = '" + w.setings.default[me.constructor.name][key] + "'"
-					} else {
-						var m = "me." + key + " = " + w.setings.default[me.constructor.name][key]
-					}
-					console.log(m)
-					eval(m)
-				})
-			}*/
-
-
-
+			this.this_world = undefined
+			this.location = undefined
+			
 			this.this_world = New_world
 			this.this_world.grid.push(this)
 
@@ -115,19 +111,29 @@ class base {
 	}
 }
 class visible extends base {
-	visible = {
+	/*visible = {
 		colour_or_img: true,
 		scail: new location2D(1, 1),
 		colour: "hsl(0, 0%, 80%)"
-	}
+	}*/
+
 	before_draw(){
 
 	}
+	
+	constructor(New_world, New_location) {
+		super(New_world, New_location)
+		this.visible = {
+			colour_or_img: true,
+			scail: new location2D(1, 1),
+			colour: "hsl(0, 0%, 80%)"
+		}
+	}
 }
 class physics extends visible {
-	physics = {
+	/*physics = {
 		solid: true
-	}
+	}*/
 	move (direction){
 		this.location = this.location.add(get_direction_as_location2D(direction))
 		if(!check(this.location, this.this_world, this)){
@@ -135,6 +141,12 @@ class physics extends visible {
 			this.move(get_opposite_direction(direction))
 		}
 		this.this_world.update()
+	}
+	constructor(New_world, New_location) {
+		super(New_world, New_location)
+		this.physics = {
+			solid: true
+		}
 	}
 	
 }
@@ -178,13 +190,15 @@ function get_direction_as_location2D(direction){
 	}
 }
 class DirectionTypeError extends TypeError{
-	message = "Input is not a direction!"
+	constructor(){
+		super()
+		message = "Input is not a direction!"
+	}
 }
 
 
 class camera extends base {
-	ctx = undefined
-	draw_on_update = false
+	
 	update(x) {
 		if(this.draw_on_update){
 			this.draw()
@@ -192,12 +206,14 @@ class camera extends base {
 	}
 	draw() {
 
+		var me = this
+
 		var ctx = this.ctx //define stuff
 		var ctx_reder = ctx.getContext("2d")
 		var xs = ctx.width
 		var ys = ctx.height
-		var by = ys / ctx.size.y
-		var bx = xs / ctx.size.x
+		var b_size_y = ys / this.screen_size.y
+		var b_size_x = xs / this.screen_size.x
 
 		ctx_reder.clearRect(0, 0, xs, ys)
 
@@ -213,9 +229,10 @@ class camera extends base {
 			if (c_block.visible.colour_or_img) {
 
 				ctx_reder.fillStyle = c_block.visible.colour //select color
-				ctx_reder.fillRect(x * bx, y * by, bx * c_block.visible.scail.x, by * c_block.visible.scail.y) //fill color
+				ctx_reder.fillRect(x * b_size_x - (me.location.x * b_size_x), y * b_size_y  - (me.location.y * b_size_y), b_size_x * c_block.visible.scail.x, b_size_y * c_block.visible.scail.y) //fill color
 			} else {
-				ctx_reder.drawImage(c_block.visible.img, x * bx, y * by, bx * c_block.visible.scail.x, by * c_block.visible.scail.y)// display img
+				//console.log(c_block.visible)
+				ctx_reder.drawImage(c_block.visible.img, x * b_size_x  - (me.location.x * b_size_x), y * b_size_y  - (me.location.y * b_size_y), b_size_x * c_block.visible.scail.x, b_size_y * c_block.visible.scail.y)// display img
 			}
 		}
 
@@ -228,8 +245,9 @@ class camera extends base {
 	
 	constructor(New_world, New_location, ctx, screen_size, draw_on_update = false) {
 		super(New_world, New_location)
+		
 		this.ctx = ctx
-		this.ctx.size = screen_size
+		this.screen_size = screen_size
 		this.draw_on_update = draw_on_update
 	}
 }
