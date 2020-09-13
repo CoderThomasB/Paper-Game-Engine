@@ -103,3 +103,5 @@ The_physics.physics.solid  // this determines whether the object is solid
 The_physics.move(directions) // this function moves the object a certain direction like directions.up. it can not move into a solid object or out of the world!
 
 ```
+#### More_physics:
+in progres
