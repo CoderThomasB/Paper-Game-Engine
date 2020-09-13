@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+	<canvas id="match" style="width: 500px; 500px; border: 1px solid; margin: auto; float: right;" width="500"
+		height="500"></canvas>
+	<script type="text/javascript" src="main.js"></script>
+	<script>
+		The_world = new world()
+		The_camera = new camera(The_world, new location2D(0, 0), document.getElementsByTagName("canvas")[0], new location2D(10, 10))
+
+		The_Test_Wow = new More_physics(The_world, new location2D(4, 4))
+
+		The_Test = new More_physics(The_world, new location2D(1, 1))
+		The_Test2 = new More_physics(The_world, new location2D(3, 1))
+		The_Test3 = new More_physics(The_world, new location2D(7, 1))
+		The_Test3 = new More_physics(The_world, new location2D(8.1, 1))
+
+		The_Test4 = new More_physics(The_world, new location2D(0, 8))
+		new More_physics(The_world, new location2D(1, 8))
+		new More_physics(The_world, new location2D(2.5, 8))
+		new More_physics(The_world, new location2D(4, 8))
+		new More_physics(The_world, new location2D(5.5, 8))
+		new More_physics(The_world, new location2D(7, 8))
+
+
+		function draw() {
+			The_camera.draw()
+		}
+
+		draw_Timer = setInterval(draw, 10)
+
+		function physics_update() {
+			The_world.physics_update()
+		}
+
+		physics_update_Timer = setInterval(physics_update, 10)
+
+		console.log(The_Test)
+		The_Test.apply_forces(new location2D(1,0))
+		The_Test_Wow.apply_forces(new location2D(10,0))
+		The_Test4.apply_forces(new location2D(3,0))
+
+	</script>
+</body>
+
+</html>

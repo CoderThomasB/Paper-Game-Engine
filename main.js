@@ -8,8 +8,15 @@ class location2D {
 	is_equal(other) {
 		return other.x == this.x && other.y == this.y
 	}
+	set_add(other) {
+		this.x += other.x
+		this.y += other.y
+	}
 	add(other) {
 		return new location2D(this.x + other.x, this.y + other.y)
+	}
+	times(other){
+		return new location2D(this.x * other.x, this.y * other.y)
 	}
 	mack_copy() {
 		return new location2D(this.x, this.y)
@@ -35,6 +42,22 @@ class world {
 		})
 		me.update_number++
 	}
+	physics_update() {
+		let now = Date.now();
+		let Delta = now - this.last_physics_update
+		var me = this
+		me.grid.forEach(function (c_block) {
+			try{
+				c_block.physics_update(Delta)
+			} catch (error){
+				if(error.constructor != TypeError){
+					console.error(error)
+				}
+			}
+
+		})
+		this.last_physics_update = now
+	}
 	start() {
 
 		this.grid.forEach(function (c_block) {
@@ -52,6 +75,24 @@ class world {
 
 		}
 		return a
+	}
+	physics_get_at_location(location, self_ = null) {
+		var b = []
+		this.grid.forEach(function (c_block) {
+			if (self_ != c_block) {
+				try{
+					if (c_block.check_collision(location)) {
+						b.push(c_block)
+					}
+				} catch(error) {
+					if(error.constructor != TypeError){
+						console.error(error)
+					}
+				}
+			}
+
+		})
+		return b
 	}
 	get_at_location(location, self_ = null) {
 		//console.log("get_at_location")]
@@ -74,7 +115,7 @@ class world {
 		this.grid = [] // a list with all the objects in it
 		this.update_number = 0 // the number of updates that have happened
 		this.size = undefined // if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'
-
+		this.last_physics_update = Date.now();
 	}
 	
 }
@@ -146,6 +187,84 @@ class physics extends visible {
 		super(New_world, New_location)
 		this.physics = {
 			solid: true
+		}
+	}
+	
+}
+
+class More_physics extends physics {
+	
+	check_collision(location){
+		return	(location.x > this.location.x
+				&&
+				location.x < this.location.add(new location2D(1,1)).x)
+
+				&&
+
+				(location.y > this.location.y
+				&&
+				location.y < this.location.add(new location2D(1,1)).y)
+	}
+
+	apply_forces(forces){
+		this.physics.velocity = this.physics.velocity.add(new location2D((forces.x / this.physics.mass), (forces.y / this.physics.mass)))
+	}
+
+	physics_update(Delta_Time){
+		if(Delta_Time > 20){
+			console.log(Delta_Time)
+		}
+
+		let thing = undefined
+		thing = this.this_world.physics_get_at_location(this.location, this)[0]
+		if(thing == undefined){thing = this.this_world.physics_get_at_location(this.location.add(new location2D(0,0.5)), this)[0]}
+		if(thing == undefined){thing = this.this_world.physics_get_at_location(this.location.add(new location2D(0.5,0)), this)[0]}
+		if(thing == undefined){thing = this.this_world.physics_get_at_location(this.location.add(new location2D(0,1)), this)[0]}
+		if(thing == undefined){thing = this.this_world.physics_get_at_location(this.location.add(new location2D(1,0)), this)[0]}
+		if(thing == undefined){thing = this.this_world.physics_get_at_location(this.location.add(new location2D(0.5,1)), this)[0]}
+		if(thing == undefined){thing = this.this_world.physics_get_at_location(this.location.add(new location2D(1,0.5)), this)[0]}
+		if(thing == undefined){thing = this.this_world.physics_get_at_location(this.location.add(new location2D(1,1)), this)[0]}
+		if(thing != undefined && thing != this.physics.last_collision){
+			let other = thing.physics.velocity
+
+			thing.physics.velocity = this.physics.velocity
+			
+			this.physics.velocity = other
+		}
+
+		this.physics.last_collision = thing
+		if(thing == undefined){
+			this.physics.last_collision = undefined
+		}
+
+		if(this.location.x < 0){
+			//this.location = this.location.add(new location2D(0.1,0))
+			this.physics.velocity.x =  Math.abs(this.physics.velocity.x)
+		}
+		if(this.location.y < 0){
+			//this.location = this.location.add(new location2D(0,0.1))
+			this.physics.velocity.y = Math.abs(this.physics.velocity.y)
+		}
+
+		if(this.location.x >= 9){
+			//this.location = this.location.add(new location2D(-0.1,0))
+			this.physics.velocity.x = Math.abs(this.physics.velocity.x) * -1
+		}
+		if(this.location.y >= 9){
+			//this.location = this.location.add(new location2D(0,-0.1))
+			this.physics.velocity.y = Math.abs(this.physics.velocity.y) * -1
+		}
+
+		this.location = this.location.add(this.physics.velocity.times(new location2D((Delta_Time / 1000), (Delta_Time / 1000))))
+	}
+
+	constructor(New_world, New_location) {
+		super(New_world, New_location)
+		this.physics = {
+			solid: true,
+			mass: 1,
+			velocity: new location2D(0,0),
+			last_collision: undefined,
 		}
 	}
 	
