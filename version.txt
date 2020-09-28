@@ -1,0 +1,6 @@
+1.0.0.0
+
+Release Number
+Major Number
+Minor Number (no compatibly)
+Minor Number (compatibly)
