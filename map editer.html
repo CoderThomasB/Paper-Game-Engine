@@ -2,7 +2,7 @@
 <html>
 
 <body>
-		<img src="/Cell Man/wall.svg" style="display: none;" id="img wall">
+		<!--<img src="/Cell Man/wall.svg" style="display: none;" id="img wall">
 		<img src="/Cell Man/wall flipped.svg" style="display: none;" id="img wall flipped">
 		<img src="/Cell Man/Wall End Up.svg" style="display: none;" id="img wall end up">
 		<img src="/Cell Man/Wall End Down.svg" style="display: none;" id="img wall end down">
@@ -13,7 +13,7 @@
 		<img src="/Cell Man/CellMan.svg" style="display: none;" id="img CellMan">
 		<img src="/Cell Man/CellMan Eat.svg" style="display: none;" id="img CellMan Eat">
 		<img src="/Cell Man/CellMan Eating.svg" style="display: none;" id="img CellMan Eating">
-		<img src="/Cell Man/Food.svg" style="display: none;" id="img Food">
+		<img src="/Cell Man/Food.svg" style="display: none;" id="img Food">-->
 	<canvas id="match" style="width: 500px; 500px; border: 1px solid; margin: auto; float: right;" width="500"
 		height="500"></canvas>
 		
@@ -77,7 +77,7 @@
 	</ul>
 	
 	<script type="text/javascript" src="main.js"></script>
-	<script>
+	<!--<script>
 		class PacMan extends physics {
 				
 
@@ -208,7 +208,7 @@
 					}
 				}
 			}
-	</script>
+	</script>-->
 	<script>
 		The_canvas = document.getElementsByTagName("canvas")[0]
 
@@ -216,9 +216,10 @@
 		The_world.size = new location2D(10,10)
 		The_camera = new camera(The_world, new location2D(0, 0), The_canvas, new location2D(10, 10))
 
-		The_Wall = new Wall(The_world, new location2D(1, 1))
+		The_visible = new visible(The_world, new location2D(1, 1))
 
 		The_select = new visible(The_world, new location2D(1, 1))
+		The_select.visible.colour = "hsl(200deg 84% 61%)"
 		The_select.destroy()
 
 		The_new_div_textarea = document.getElementById("The_new_div_textarea")
@@ -268,6 +269,12 @@
 					})
 				})
 		}
+		/*function show_property (key, value, containing_Div){
+			The_li = The_object_propertys.appendChild(document.createElement("LI"))
+			The_Div = The_li.appendChild(document.createElement("div"))
+			The_Name = The_Div.appendChild(document.createElement("input"))
+			The_Span = The_Div.appendChild(document.createElement("span"))
+		}*/
 		function show_propertys(object) {
 			The_object_propertys.innerHTML = ""
 			Object.keys(object).forEach(
