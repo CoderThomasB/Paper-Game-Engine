@@ -1,0 +1,32 @@
+{
+  "name": "paper-game-engine",
+  "version": "1.0.0",
+  "description": "Paper is a simple game engine",
+  "main": "main.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node main.js && node 'Multi-Player/Test.js'",
+    "install": "npm install cors crypto express uuid",
+    "uninstall": "npm remove cors crypto express uuid"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoderThomasB/Paper-Game-Engine.git"
+  },
+  "keywords": [
+    "game",
+    "engine"
+  ],
+  "author": "Thomas Booker <tw.booker@outlook.com>",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/CoderThomasB/Paper-Game-Engine/issues"
+  },
+  "homepage": "https://github.com/CoderThomasB/Paper-Game-Engine#readme"
+}
