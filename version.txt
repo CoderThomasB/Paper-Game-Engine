@@ -1,6 +1,6 @@
-1.0.0.0
+M.1.0.0
 
-Release Number
+Release Letter (M for multiPlayer)
 Major Number
 Minor Number (no compatibly)
 Minor Number (compatibly)

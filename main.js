@@ -1,43 +1,74 @@
 
-class location2D {
+globalThis.location2D = class location2D {
+	/**
+	 * @param {number} x
+	 * @param {number} y
+	 */
 	constructor(x = Number.NaN, y = Number.NaN) {
 		this.x = x
 		this.y = y
 	}
 
+	/**
+	 * @param {location2D} other
+	 * @returns {location2D}
+	 */
 	is_equal(other) {
 		return other.x == this.x && other.y == this.y
 	}
+	/**
+	 * @param {location2D} other
+	 * @returns {location2D}
+	 */
 	add(other) {
 		return new location2D(this.x + other.x, this.y + other.y)
 	}
+	/**
+	 * @param {location2D} other
+	 * @returns {location2D}
+	 */
 	subtract(other) {
 		return new location2D(this.x - other.x, this.y - other.y)
 	}
+	/**
+	 * @param {location2D} other
+	 * @returns {location2D}
+	 */
 	min(other) {
 		return new location2D(Math.min(this.x, other.x), Math.min(this.y, other.y))
 	}
+	/**
+	 * @param {location2D} other
+	 * @returns {location2D}
+	 */
 	max(other) {
 		return new location2D(Math.max(this.x, other.x), Math.max(this.y, other.y))
 	}
+	/**
+	 * @param {location2D} other
+	 * @returns {location2D}
+	 */
 	mack_copy() {
 		return new location2D(this.x, this.y)
 	}
+	/**
+	 * @param {location2D} other
+	 * @returns {location2D}
+	 */
 	toString() {
 		return `{"x": ${this.x},"y": ${this.y}}`
 	}
 }
 
 
-class world {
-	// Safari dose not do this
-	//grid = [] // a list with all the objects in it
-	//update_number = 0 // the number of updates that have happened
-	//size = undefined // if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'
 
+globalThis.world = class world {
+
+	/**
+	 * timed_update is meant for being called at an interval to stop infinite updates.
+	 */
 	timed_update() {
 		var me = this
-		//console.time(this.update_number.toString())
 		me.grid.forEach(function (c_block) {
 			try {
 				c_block.timed_update(me.update_number)
@@ -45,19 +76,25 @@ class world {
 
 			}
 		})
-		//console.timeEnd(this.update_number.toString())
 		me.update_number++
 	}
 
+	/**
+	 * the update function is meant to update all the aspects fo all the objects can be called if something changes.
+	 * runs all the update functions in all the grid objects and adds one to the update_number.
+	 */
 	update() {
 		var me = this
-		//console.time(this.update_number.toString())
 		me.grid.forEach(function (c_block) {
-			c_block.update(me.update_number)
+			try {
+				c_block.update(me.update_number)
+			} catch (error) { }
 		})
-		//console.timeEnd(this.update_number.toString())
 		me.update_number++
 	}
+	/**
+	 * can be called when the all the things are setup is smiler to the update function but is only meant to be used once.
+	 */
 	start() {
 
 		this.grid.forEach(function (c_block) {
@@ -66,16 +103,27 @@ class world {
 		})
 
 	}
-	get_in_grid(self_) {
+	/**
+	 * @param {Object} object
+	 * @returns {Number}
+	 * returns the number that an object has in the grid.
+	 */
+	get_in_grid(object) {
 		var a;
 		for (var x = 0; x < this.grid.length; x++) {
-			if (self_ == this.grid[x]) {
+			if (object == this.grid[x]) {
 				a = x
 			}
 
 		}
 		return a
 	}
+	/**
+	 * @param {location2D} location
+	 * @param {Object} self_
+	 * @returns {Array}
+	 * gets all the object's at a location.
+	 */
 	get_at_location(location, self_ = null) {
 
 		var b = []
@@ -89,95 +137,94 @@ class world {
 			}
 
 		})
-
 		return b
-
-
 	}
+	/**
+	 * 
+	 */
 	constructor() {
-		this.grid = [] // a list with all the objects in it
-		this.update_number = 0 // the number of updates that have happened
-		this.size = undefined // if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'
-
-
+		this.grid = []			// a list with all the objects in it.
+		this.update_number = 0	// the number of updates that have happened.
+		this.size = undefined	// if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'.
 	}
 
 }
-class base {
+globalThis.base = class base {
+	/**
+	 * this function get called when the world's start function is called.
+	 */
 	start() { }
-	update(x) { }
+	/**
+	 * @param {Number} update_number the update_number is the number of updates since world creation.
+	 * this function get called when the world's update function is called.
+	 */
+	update(update_number) { }
+	/**
+	 * @param {Number} amount the amount of damage.
+	 * this is not used in the main file but it is hire for compatibility.
+	 */
 	damage(amount) { }
+	/**
+	 * this is used for deleting and removing references to the object.
+	 */
 	destroy() {
 		this.this_world.grid.splice(this.this_world.get_in_grid(this), 1)
 		this.this_world = undefined
 	}
 
-	// Safari dose not do this
-	//this_world = null
-	//location = null
-
+	/**
+	 * @param {world} New_world the world this the object is in.
+	 * @param {location2D} New_location the location of the object.
+	 */
 	constructor(New_world, New_location) {
-		var me = this
-		try {
-
-			this.this_world = undefined
-			this.location = undefined
-
-			this.this_world = New_world
-			this.this_world.grid.push(this)
-
-			this.location = New_location
-
-		} catch (e) {
-			console.log(e)
-
-		}
+		this.this_world = New_world
+		this.this_world.grid.push(this)
+		this.location = New_location
 	}
 }
 
-class visible extends base {
-	/*visible = {
-		colour_or_img: true,
-		scail: new location2D(1, 1),
-		colour: "hsl(0, 0%, 80%)"
-	}*/
-
+globalThis.visible = class visible extends base {
+	/**
+	 * this function is called just before the object is drawn
+	 */
 	before_draw() {
 
 	}
-
+	/**
+	 * @param {world} New_world the world this the object is in.
+	 * @param {location2D} New_location the location of the object.
+	 */
 	constructor(New_world, New_location) {
 		super(New_world, New_location)
-		/*this.visible = {
-			colour_or_img: true,
-			scail: new location2D(1, 1),
-			colour: "hsl(0, 0%, 80%)"
-		}*/
 
-		// The New reding systeam
-		// NOT WORKING YET!
-		/*this.visible = 
+		this.visible =
 			[new render_component(
-				new rectangle(new location2D(1,1)),
-				"hsl(0, 0%, 80%)")]*/
+				new rectangle(new location2D(1, 1)),
+				"hsl(0, 0%, 80%)"
+			)
+			]
 	}
 }
 
-class physics extends visible {
-	/*physics = {
-		solid: true
-	}*/
+globalThis.physics = class physics extends visible {
+	/**
+	 * moves the object in a direction but not in to solid object (triggers an update)
+	 * @param {Number} direction the location of the object.
+	 */
 	move(direction) {
 		this.location = this.location.add(get_direction_as_location2D(direction))
 		if (!check(this.location, this.this_world, this)) {
 			//console.log("INVALID MOVE")
 			this.move(get_opposite_direction(direction))
-			this.this_world.update()
 			return false
 		}
-		return true
 		this.this_world.update()
+		return true
 	}
+	/**
+	 * @param {world} New_world the world this the object is in.
+	 * @param {location2D} New_location the location of the object.
+	 */
 	constructor(New_world, New_location) {
 		super(New_world, New_location)
 		this.physics = {
@@ -187,12 +234,19 @@ class physics extends visible {
 
 }
 
-class base_component {
+/**
+ * component system is not complete yet
+ */
+globalThis.base_component = class base_component {
 
 }
 
-class sound_component {
-	constructor(sound_src, loop=false) {
+globalThis.sound_component = class sound_component {
+	/**
+	 * @param {String} sound_src the src of the sound
+	 * @param {Boolean} loop determines if the sound will loop
+	 */
+	constructor(sound_src, loop = false) {
 		this.HTML_sound = document.createElement("audio");
 		this.HTML_sound.src = sound_src;
 		this.HTML_sound.loop = loop;
@@ -203,28 +257,44 @@ class sound_component {
 	}
 }
 
-// Not in use yet!
-/*class render_component extends base_component {
+
+globalThis.render_component = class render_component extends base_component {
+	/**
+	 * @param {Object} shape the shape of the component
+	 * @param {String} colour the colour of the component
+	 */
 	constructor(shape, colour) {
+		super()
 		this.shape = shape
+		this.offset = new location2D(0, 0)
 		this.use_colour_or_img = colour_or_img.colour
 		this.colour = colour
 		this.img = undefined
 	}
 }
 
-class rectangle {
-	constructor (size){
+globalThis.rectangle = class rectangle {
+	/**
+	 * @param {location2D} size the size of the rectangle in width and height
+	 */
+	constructor(size) {
+		if (size == undefined) {
+			size = new location2D(1, 1)
+		}
 		this.size = size
 	}
 }
 
-const colour_or_img = {
+globalThis.colour_or_img = {
 	colour: true,
 	img: false
 }
-*/
-function get_opposite_direction(direction) {
+
+/**
+ * @param {number} direction
+ * @returns {number}
+ */
+globalThis.get_opposite_direction = (direction) => {
 	switch (direction) {
 		case directions.up:
 			return directions.down
@@ -243,99 +313,148 @@ function get_opposite_direction(direction) {
 			break
 	}
 }
-function get_direction_as_location2D(direction) {
+
+/**
+ * @param {number} direction
+ * @returns {location2D}
+ */
+globalThis.get_direction_as_location2D = (direction) => {
 	switch (direction) {
 		case directions.up:
 			return new location2D(0, -1)
-			break
 		case directions.down:
 			return new location2D(0, 1)
-			break
 		case directions.left:
 			return new location2D(-1, 0)
-			break
 		case directions.right:
 			return new location2D(1, 0)
-			break
 		default:
 			throw new DirectionTypeError()
-			break
 	}
 }
-class DirectionTypeError extends TypeError {
+
+globalThis.DirectionTypeError = class DirectionTypeError extends TypeError {
 	constructor() {
 		super()
-		message = "Input is not a direction!"
+		this.message = "Input is not a direction!"
 	}
 }
 
 
-class camera extends base {
+globalThis.camera = class camera extends base {
 
-	update(x) {
-		if (this.draw_on_update) {
+	timed_update(x) {
+		if (this.draw_on_timed_update) {
 			this.draw()
 		}
 	}
+	/**
+	 * draws the world to the ctx
+	 */
 	draw() {
 
 		var me = this
 
 		var ctx = this.ctx //define stuff
-		var ctx_reder = ctx.getContext("2d")
+		var ctx_context = ctx.getContext("2d")
 		var xs = ctx.width
 		var ys = ctx.height
 		var b_size_y = ys / this.screen_size.y
 		var b_size_x = xs / this.screen_size.x
 
-		ctx_reder.clearRect(0, 0, xs, ys)
+		ctx_context.clearRect(0, 0, xs, ys)
 
-		var draw_elmint = function (c_block) {
+		var draw_element = function (A_render_component, thing) {
 
-			var x = c_block.location.x
-			var y = c_block.location.y
+			var x = thing.location.x
+			var y = thing.location.y
 			try {
-				c_block.before_draw()
+				thing.before_draw()
 			} catch (error) {
 				console.error(error)
 			}
-			if (c_block.visible.colour_or_img) {
-
-				ctx_reder.fillStyle = c_block.visible.colour //select color
-				ctx_reder.fillRect(x * b_size_x - (me.location.x * b_size_x), y * b_size_y - (me.location.y * b_size_y), b_size_x * c_block.visible.scail.x, b_size_y * c_block.visible.scail.y) //fill color
-			} else {
-				//console.log(c_block.visible)
-				ctx_reder.drawImage(c_block.visible.img, x * b_size_x - (me.location.x * b_size_x), y * b_size_y - (me.location.y * b_size_y), b_size_x * c_block.visible.scail.x, b_size_y * c_block.visible.scail.y)// display img
+			switch (A_render_component.shape.constructor) {
+				case rectangle:
+					switch (A_render_component.use_colour_or_img) {
+						case colour_or_img.img:
+							ctx_context.drawImage(
+								A_render_component.img,
+								Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
+								Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y),
+								Math.round(b_size_x * A_render_component.shape.size.x),
+								Math.round(b_size_y * A_render_component.shape.size.y))// display img
+							break;
+						case colour_or_img.colour:
+							ctx_context.fillStyle = A_render_component.colour //select color
+							ctx_context.fillRect(
+								Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
+								Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y),
+								/*x * b_size_x - (me.location.x * b_size_x),
+								y * b_size_y - (me.location.y * b_size_y),*/
+								Math.round(b_size_x * A_render_component.shape.size.x),
+								Math.round(b_size_y * A_render_component.shape.size.y)) //fill color
+							break;
+						default:
+							console.log(`Invalid use_colour_or_img on`)
+							console.log(A_render_component)
+							break;
+					}
+					break;
+				default:
+					console.log(`Invalid shape on`)
+					console.log(A_render_component)
+					break;
 			}
+
 		}
 
 		this.this_world.grid.forEach(function (c_block) {
 			if (c_block.visible != undefined) {
-				draw_elmint(c_block)
+				//console.log(c_block.visible)
+				c_block.visible.forEach((A_render_component) => {
+					draw_element(A_render_component, c_block)
+				})
 			}
 		})
 	}
-
-	constructor(New_world, New_location, ctx, screen_size, draw_on_update = false) {
+	/**
+	 * @param {world} New_world the world this the object is in.
+	 * @param {location2D} New_location the location of the object.
+	 * @param {HTMLCanvasElement} ctx the Canvas used for drawing.
+	 * @param {location2D} screen_size the size of the 'screen' or render area.
+	 * @param {Boolean} draw_on_timed_update an option for auto drawing on timed_update.
+	 */
+	constructor(New_world, New_location, ctx, screen_size, draw_on_timed_update = false) {
 		super(New_world, New_location)
 
 		this.ctx = ctx
 		this.screen_size = screen_size
-		this.draw_on_update = draw_on_update
+		this.draw_on_timed_update = draw_on_timed_update
 	}
 }
 
-
-
-// true is valid and false is invalid
-// self_ is the objets self used to not detet it self
-function check(location, The_world, self_) {
+/**
+ * @param {location2D} location the location to check.
+ * @param {world} The_world the world to check in.
+ * @param {Object} self_ the function will not included this in the output
+ * @returns {Boolean}
+ * true is valid and false is invalid
+ */
+globalThis.check = (location, The_world, self_) => {
 	is = true
 	is = check_out_of_world(location, The_world) && is
 	is = check_is_in_solid(location, The_world, self_) && is
 	return is
 }
-function check_out_of_world(location, The_world) {
+
+/**
+ * @param {location2D} location the location to check.
+ * @param {world} The_world the world to check in.
+ * @returns {Boolean}
+ * true is valid and false is invalid
+ * only checks if the location is out of the world 'size'
+ */
+globalThis.check_out_of_world = (location, The_world) => {
 	if (The_world.size == undefined) {
 		return true
 	}
@@ -347,7 +466,16 @@ function check_out_of_world(location, The_world) {
 			(location.x >= 0 && location.y >= 0))
 	return is_out_of_world
 }
-function check_is_in_solid(location, The_world, self_) {
+
+/**
+ * @param {location2D} location the location to check.
+ * @param {world} The_world the world to check in.
+ * @param {Object} self_ the function will not included this in the output
+ * @returns {Boolean}
+ * true is valid and false is invalid
+ * only checks if the location is occupied by a solid object
+ */
+globalThis.check_is_in_solid = (location, The_world, self_) => {
 	is_in_solid = false
 	The_world.get_at_location(location, self_).forEach(function (Thing) {
 		if (Thing.physics != undefined) {
@@ -357,16 +485,20 @@ function check_is_in_solid(location, The_world, self_) {
 	return !is_in_solid
 }
 
-
-const directions = {
+/**
+ * @enum {Number}
+ */
+globalThis.directions = {
 	up: 1,
 	right: 2,
 	down: 3,
-	left: 4
+	left: 4,
 }
 
-
-class rotashon2D {
+/**
+ * Not Finished - Do Not Use
+ */
+globalThis.rotation2D = class rotation2D {
 	constructor(z = Number.NaN) {
 		this.z = z
 	}
@@ -382,10 +514,18 @@ class rotashon2D {
 	mack_copy() {
 		return new location2D(this.z)
 	}
-	in_degrs() {
+	in_degrees() {
 		return this.z
 	}
-	in_radins() {
+	in_radians() {
 		return (this.z / 180) * Maths.PI
 	}
+}
+
+// Checks if running in node or web browser
+try {
+	exports.test = "test"
+	console.log("NodeJS")
+} catch (error) {
+	console.log("Web Browser")
 }
