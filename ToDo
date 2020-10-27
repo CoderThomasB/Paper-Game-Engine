@@ -1,2 +1,13 @@
 add text rendering
-add the more advises chat systems to the Add-ons/chat/Client.js
+
+add some text above players charters in the multiplayer example with the players names
+
+improve the map editor
+	exporting of maps
+	create a good work flow
+
+improve multiplayer performers by
+	changing the way the the world is replicated -
+	instead of sending the render data, send the changes to the world with the client keeping a copy
+
+improve the documentation - a lot!
