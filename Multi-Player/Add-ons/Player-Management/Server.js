@@ -37,6 +37,13 @@ globalThis.Player_interface = class Player_interface {
 		return true
 		// Players can not change there uuids
 	}
+	get_console_name(){
+		let output = this.uuid
+		if(this.name != undefined){
+			output += ` (${this.name})`
+		}
+		return output
+	}
 }
 
 globalThis.Player_API = class Player_API {
@@ -94,7 +101,7 @@ globalThis.Player_API = class Player_API {
 			if (the_check == true) {
 				var the_Player = new the_player_interface(req, me)
 				this.Players.push(the_Player)
-				console.log(`Add ${the_Player.uuid}`)
+				console.log(`Add ${the_Player.get_console_name()}`)
 				res.statusCode = 201
 				res.json(the_Player.toJSON())
 			} else {
@@ -117,6 +124,7 @@ globalThis.Player_API = class Player_API {
 			let the_player = this.get_player_by_uuid(req.params.UUID)
 			if (the_player.change(req.query)) {
 				res.statusCode = 200
+				console.log(`changed ${the_player.get_console_name()}`)
 			} else {
 				console.log("invalid change")
 				res.statusCode = 400
@@ -126,11 +134,12 @@ globalThis.Player_API = class Player_API {
 		app.delete(`${base_url}:UUID`, (req, res) => {
 			for (var i = 0; i < this.Players.length; i++) {
 				if (this.Players[i].uuid == req.params.UUID) {
-					console.log(this.Players[i].constructor)
-					this.Players[i].destroy()
+					let the_player = this.Players[i]
+					let console_name = the_player.get_console_name()
+					the_player.destroy()
 					this.Players.splice(i, 1)
 					res.json({ text: "success" })
-					console.log(`Removed ${req.params.UUID}`)
+					console.log(`Removed ${console_name}`)
 					return
 				}
 			}
