@@ -1,4 +1,4 @@
-M.1.0.2
+M.1.0.3
 
 Release Letter (M for multiPlayer)
 Major Number
