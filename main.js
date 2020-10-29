@@ -280,8 +280,41 @@ globalThis.rectangle = class rectangle {
 	constructor(size) {
 		if (size == undefined) {
 			size = new location2D(1, 1)
+		} else {
+			this.size = size
 		}
-		this.size = size
+	}
+}
+
+globalThis.text_shape = class text_shape {
+	/**
+	 * @param {String} text the text that will be displayed
+	 * @param {Number} size one of the dimension of the text
+	 * @param {"height" | "width"} sizeType choses which dimension the is of
+	 * @param {"left" | "right" | "center" | "start" | "end"} textAlign
+	 * 
+	 * you can not set height and width only one
+	 */
+	constructor(text, size, sizeType, textAlign = "start") {
+		this.text = text
+		this.textAlign = textAlign
+		if (sizeType === "height") {
+			this.set_height(size)
+		} else if (sizeType === "width") {
+			this.set_width(size)
+		} else {
+			this.set_height(0.5)
+		}
+	}
+	set_height(value) {
+		console.log("height")
+		this.size = "height"
+		this.height = value
+	}
+	set_width(value) {
+		console.log("width")
+		this.size = "width"
+		this.width = value
 	}
 }
 
@@ -364,6 +397,7 @@ globalThis.camera = class camera extends base {
 
 		ctx_context.clearRect(0, 0, xs, ys)
 
+
 		var draw_element = function (A_render_component, thing) {
 
 			var x = thing.location.x
@@ -400,6 +434,22 @@ globalThis.camera = class camera extends base {
 							break;
 					}
 					break;
+				case text_shape:
+					ctx_context.fillStyle = A_render_component.colour //select color
+					if (A_render_component.shape.size == "height") {
+						ctx_context.font = `${(b_size_y * A_render_component.shape.height * 1.4) - 1}px monospace`
+					}
+					if (A_render_component.shape.size == "width") {
+						ctx_context.font = `${b_size_x * ((A_render_component.shape.width / A_render_component.shape.text.length) * 1.70)}px monospace`
+					}
+					ctx_context.textAlign = A_render_component.shape.textAlign
+					ctx_context.fillText(
+						A_render_component.shape.text,
+						Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
+						Math.round(
+							(y + A_render_component.offset.y - me.location.y) * b_size_y),
+					)
+					break
 				default:
 					console.log(`Invalid shape on`)
 					console.log(A_render_component)
