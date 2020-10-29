@@ -318,6 +318,26 @@ globalThis.text_shape = class text_shape {
 	}
 }
 
+globalThis.polygon = class polygon {
+	/**
+	 * @param {Array<location2D>} points
+	 * @param {boolean} fill
+	 */
+	constructor(points, fill = false) {
+		this.points = points
+		this.fill = fill
+	}
+}
+
+globalThis.line = class line {
+	/**
+	 * @param {location2D} vector
+	 */
+	constructor(vector) {
+		this.vector = vector
+	}
+}
+
 globalThis.colour_or_img = {
 	colour: true,
 	img: false
@@ -449,6 +469,40 @@ globalThis.camera = class camera extends base {
 						Math.round(
 							(y + A_render_component.offset.y - me.location.y) * b_size_y),
 					)
+					break
+				case line:
+					ctx_context.fillStyle = A_render_component.colour //select color
+					ctx_context.beginPath()
+					ctx_context.moveTo(
+						Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
+						Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y)
+					)
+					ctx_context.lineTo(
+						Math.round((x + A_render_component.offset.x - me.location.x + A_render_component.shape.vector.x) * b_size_x),
+						Math.round((y + A_render_component.offset.y - me.location.y + A_render_component.shape.vector.y) * b_size_y)
+					)
+					ctx_context.closePath();
+					ctx_context.stroke();
+					break;
+				case polygon:
+					ctx_context.fillStyle = A_render_component.colour //select color
+					ctx_context.beginPath()
+					ctx_context.moveTo(
+						Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
+						Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y)
+					)
+					for (let i = 0; i < A_render_component.shape.points.length; i++) {
+						ctx_context.lineTo(
+							Math.round((x + A_render_component.offset.x - me.location.x + A_render_component.shape.points[i].x) * b_size_x),
+							Math.round((y + A_render_component.offset.y - me.location.y + A_render_component.shape.points[i].y) * b_size_y)
+						)
+					}
+					if (A_render_component.shape.fill) {
+						ctx_context.fill();
+					} else {
+						ctx_context.closePath();
+						ctx_context.stroke();
+					}
 					break
 				default:
 					console.log(`Invalid shape on`)

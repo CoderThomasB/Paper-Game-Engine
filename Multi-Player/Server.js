@@ -5,7 +5,7 @@ globalThis.express = require("express")
 
 globalThis.ActionLink_component = class ActionLink_component {
 	constructor(app, _URL, Action) {
-		
+
 		this.app = app
 		this._URL = _URL
 		this.Action = Action
@@ -14,10 +14,10 @@ globalThis.ActionLink_component = class ActionLink_component {
 		var me = this
 
 		app.post(_URL, (req, res) => {
-			try{
-			res.json(me.Action(req.query, me))
-			}catch(e){
-				if(e.constructor = DirectionTypeError){
+			try {
+				res.json(me.Action(req.query, me))
+			} catch (e) {
+				if (e.constructor = DirectionTypeError) {
 					console.log("input is not a direction")
 				}
 			}
@@ -86,7 +86,7 @@ globalThis.cameraLink = class cameraLink extends base {
 										A_render_component.shape.size.y,
 									]
 								}
-								break 
+								break
 							case text_shape:
 								draw_data_Now.shape_data = {}
 								draw_data_Now.shape_data.size = A_render_component.shape.size
@@ -94,7 +94,25 @@ globalThis.cameraLink = class cameraLink extends base {
 								draw_data_Now.shape_data.width = A_render_component.shape.width
 								draw_data_Now.shape_data.textAlign = A_render_component.shape.textAlign
 								draw_data_Now.shape_data.text = A_render_component.shape.text
-							}
+
+								break
+							case line:
+								draw_data_Now.shape_data.vector = [
+									(c_block.location.x + A_render_component.offset.x - me.location.x + A_render_component.shape.vector.x),
+									(c_block.location.y + A_render_component.offset.y - me.location.y + A_render_component.shape.vector.y)]
+								break
+							case polygon:
+								draw_data_Now.shape_data = {}
+								draw_data_Now.shape_data.points = []
+								for (let i = 0; i < A_render_component.shape.points.length; i++) {
+									draw_data_Now.shape_data.points[i] = [
+										(c_block.location.x + A_render_component.offset.x - me.location.x + A_render_component.shape.points[i].x),
+										(c_block.location.y + A_render_component.offset.y - me.location.y + A_render_component.shape.points[i].y)
+									]
+								}
+								draw_data_Now.shape_data.fill = A_render_component.shape.fill
+								break
+						}
 						draw_data.push(draw_data_Now)
 					})
 				}

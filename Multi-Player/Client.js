@@ -76,6 +76,38 @@ class client_camera {
 						Math.round(element.location[1] * b_size_y),
 					)
 					break
+				case "line":
+					ctx_context.fillStyle = element.colour
+					ctx_context.beginPath()
+					ctx_context.moveTo(
+						Math.round(element.location[0] * b_size_x),
+						Math.round(element.location[1] * b_size_y)
+					)
+					ctx_context.lineTo(
+						Math.round(element.shape_data.vector[0] * b_size_x),
+						Math.round(element.shape_data.vector[1] * b_size_y)
+					)
+					break
+				case "polygon":
+					ctx_context.fillStyle = element.colour
+					ctx_context.beginPath()
+					ctx_context.moveTo(
+						Math.round(element.location[0] * b_size_x),
+						Math.round(element.location[1] * b_size_y)
+					)
+					for (let i = 0; i < element.shape_data.points.length; i++) {
+						ctx_context.lineTo(
+							Math.round(element.shape_data.points[i][0] * b_size_x),
+							Math.round(element.shape_data.points[i][1] * b_size_y)
+						)
+					}
+					if (element.shape_data.fill) {
+						ctx_context.fill();
+					} else {
+						ctx_context.closePath();
+						ctx_context.stroke();
+					}
+					break
 				default:
 					console.log(`Invalid shape :`)
 					console.log(element.shape_type)
