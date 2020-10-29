@@ -86,7 +86,15 @@ globalThis.cameraLink = class cameraLink extends base {
 										A_render_component.shape.size.y,
 									]
 								}
-						}
+								break 
+							case text_shape:
+								draw_data_Now.shape_data = {}
+								draw_data_Now.shape_data.size = A_render_component.shape.size
+								draw_data_Now.shape_data.height = A_render_component.shape.height
+								draw_data_Now.shape_data.width = A_render_component.shape.width
+								draw_data_Now.shape_data.textAlign = A_render_component.shape.textAlign
+								draw_data_Now.shape_data.text = A_render_component.shape.text
+							}
 						draw_data.push(draw_data_Now)
 					})
 				}

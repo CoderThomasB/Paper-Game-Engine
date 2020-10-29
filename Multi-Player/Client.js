@@ -61,6 +61,20 @@ class client_camera {
 							break;
 					}
 					break;
+				case "text_shape":
+					ctx_context.textAlign = element.shape_data.textAlign
+					if (element.shape_data.size == "height") {
+						ctx_context.font = `${(b_size_y * element.shape_data.height * 1.4) - 1}px monospace`
+					}
+					if (element.shape_data.size == "width") {
+						ctx_context.font = `${b_size_x * ((element.shape_data.width / element.shape_data.text.length) * 1.70)}px monospace`
+					}
+					ctx_context.fillText(
+						element.shape_data.text,
+						Math.round(element.location[0] * b_size_x),
+						Math.round(element.location[1] * b_size_y),
+					)
+					break
 				default:
 					console.log(`Invalid shape :`)
 					console.log(element.shape_type)
