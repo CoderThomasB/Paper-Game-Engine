@@ -62,6 +62,7 @@ class client_camera {
 					}
 					break;
 				case "text_shape":
+					ctx_context.fillStyle = element.colour
 					ctx_context.textAlign = element.shape_data.textAlign
 					if (element.shape_data.size == "height") {
 						ctx_context.font = `${(b_size_y * element.shape_data.height * 1.4) - 1}px monospace`

@@ -28,11 +28,26 @@ class custom_Player_interface extends Player_interface {
 		this.player_object = new player_object(the_world, new location2D(5, 5), this)
 		this.the_cameraLink = new cameraLink(the_world, new location2D(0, 0), new location2D(11, 11), app, this.get_camera_url())
 
+		
+		/*this.player_object.visible[1] = new render_component(new text_shape(this.name, 1.2, "width", "center"), "black")
+		this.player_object.visible[1].offset.x = 0.5
+		this.player_object.visible[1].offset.y = -0.1*/
+		this.player_object.visible[1] = new render_component(new text_shape(this.name, 0.8, "width", "center"), "black")
+		this.player_object.visible[1].offset.x = 0.5
+		this.player_object.visible[1].offset.y = 0.5
 		this.player_object.visible[0].colour = `rgb(${randomInt(255)},${randomInt(255)},${randomInt(255)})`
 		this.player_object.location.x = randomInt(4) + 1
 		this.player_object.location.y = randomInt(4) + 1
 
 		the_world.update()
+	}
+	change_name(name) {
+		this.name = name
+		try{
+			this.player_object.visible[1].shape.text = name
+		} catch(e){
+
+		}
 	}
 	move_Action(query, the_ActionLink) {
 		the_ActionLink.parent.player_object.move(

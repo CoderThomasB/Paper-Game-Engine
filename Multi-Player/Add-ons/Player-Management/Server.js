@@ -10,7 +10,7 @@ globalThis.Player_interface = class Player_interface {
 		this.my_Player_API = my_Player_API
 		this.uuid = _uuid.v4(Math.random())
 		if (my_Player_API.check_name(req.query.name)) {
-			this.name = req.query.name
+			this.change_name(req.query.name)
 		}
 	}
 	/**
@@ -30,16 +30,19 @@ globalThis.Player_interface = class Player_interface {
 	 */
 	change(data) {
 		if (this.my_Player_API.check_name(data.name)) {
-			this.name = data.name
+			this.change_name(data.name)
 		} else {
 			return false
 		}
 		return true
 		// Players can not change there uuids
 	}
-	get_console_name(){
+	change_name(name) {
+		this.name = name
+	}
+	get_console_name() {
 		let output = this.uuid
-		if(this.name != undefined){
+		if (this.name != undefined) {
 			output += ` (${this.name})`
 		}
 		return output
@@ -65,7 +68,7 @@ globalThis.Player_API = class Player_API {
 			if (this.check_name(req.query.name)) {
 				return true
 			} else {
-				return {error: "name"}
+				return { error: "name" }
 			}
 		}
 		return true

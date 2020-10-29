@@ -63,15 +63,15 @@
 		float: left;
 		margin-top: calc(50vh - 4em);
 		">
-		<button class="arrow_buttons" id="up_button" onclick="my_Player_interface.move(directions.up);">&#8593;</button>
+		<button class="arrow_buttons" id="up_button" onmousedown="my_Player_interface.move(directions.up);">&#8593;</button>
 		<br>
 		<button class="arrow_buttons" id="down_button"
-			onclick="my_Player_interface.move(directions.down);">&#8595;</button>
+		onmousedown="my_Player_interface.move(directions.down);">&#8595;</button>
 
 		<button class="arrow_buttons" id="left_button"
-			onclick="my_Player_interface.move(directions.left);">&#8592;</button>
+		onmousedown="my_Player_interface.move(directions.left);">&#8592;</button>
 		<button class="arrow_buttons" id="right_button"
-			onclick="my_Player_interface.move(directions.right);">&#8594;</button>
+		onmousedown="my_Player_interface.move(directions.right);">&#8594;</button>
 		<style>
 			.arrow_buttons {
 				background-color: rgb(82 82 82);
