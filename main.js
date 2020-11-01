@@ -603,6 +603,10 @@ globalThis.directions = {
  * Not Finished - Do Not Use
  */
 globalThis.rotation2D = class rotation2D {
+
+	/**
+	 * Not Finished - Do Not Use
+	 */
 	constructor(z = Number.NaN) {
 		this.z = z
 	}
