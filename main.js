@@ -19,7 +19,7 @@ globalThis.location2D = class location2D {
 	 * @returns {location2D}
 	 */
 	is_equal(other) {
-		return other.x == this.x && other.y == this.y
+		return other.x === this.x && other.y === this.y
 	}
 	/**
 	 * @param {location2D} other
@@ -116,7 +116,7 @@ globalThis.world = class world {
 	get_in_grid(object) {
 		var a;
 		for (var x = 0; x < this.grid.length; x++) {
-			if (object == this.grid[x]) {
+			if (object === this.grid[x]) {
 				a = x
 			}
 
@@ -348,7 +348,7 @@ globalThis.animation = class animation {
 			if (me.now <= me.end) {
 				Object.keys(object).forEach((key) => {
 					let value = me.get_attribute_value_now(key)
-					if (value == undefined) {
+					if (value === undefined) {
 						return
 					} else {
 						object[key] = value
@@ -367,14 +367,14 @@ globalThis.animation = class animation {
 	 */
 	get_attribute_value_now(attribute) {
 		let options = this.get_keyframes_with_attribute(attribute)
-		if (options.length == 0) {
+		if (options.length === 0) {
 			return undefined
 		}
 		let closet_keyframe_behind = undefined
 		let closet_keyframe_ahead = undefined
 		options.forEach((keyframe) => {
 			if (keyframe.time <= this.now) {
-				if (closet_keyframe_behind == undefined) {
+				if (closet_keyframe_behind === undefined) {
 					closet_keyframe_behind = keyframe
 					return
 				}
@@ -383,7 +383,7 @@ globalThis.animation = class animation {
 					return
 				}
 			} else {
-				if (closet_keyframe_ahead == undefined) {
+				if (closet_keyframe_ahead === undefined) {
 					closet_keyframe_ahead = keyframe
 					return
 				}
@@ -393,14 +393,14 @@ globalThis.animation = class animation {
 				}
 			}
 		})
-		if (closet_keyframe_behind == undefined) {
+		if (closet_keyframe_behind === undefined) {
 			return undefined
 		}
-		if (closet_keyframe_behind.type == keyframe_types.snap) {
+		if (closet_keyframe_behind.type === keyframe_types.snap) {
 			return closet_keyframe_behind.value
 		}
-		if (closet_keyframe_behind.type == keyframe_types.liner) {
-			if (closet_keyframe_ahead == undefined) {
+		if (closet_keyframe_behind.type === keyframe_types.liner) {
+			if (closet_keyframe_ahead === undefined) {
 				return closet_keyframe_behind.value
 			}
 			let behind_length = this.now - closet_keyframe_behind.time
@@ -439,7 +439,7 @@ globalThis.keyframe = class keyframe {
 	 * @param {Any} value 
 	 */
 	constructor(time, attribute, value, type = keyframe_types.snap) {
-		if (type == keyframe_types.liner) {
+		if (type === keyframe_types.liner) {
 			if (value.constructor != Number) {
 				throw new error("can not be liner if value not a number")
 			}
@@ -497,7 +497,7 @@ globalThis.animatable_function_render_component = class animatable_function_rend
 		this.is_playing = false
 	}
 	before_draw(){
-		if (this.is_playing == false) { return }
+		if (this.is_playing === false) { return }
 		if (this.now > this.end) { stop(); return }
 		let now = Date.now()
 		let delta_time = now - this.last_time
@@ -535,7 +535,7 @@ globalThis.animatable_keyframe_render_component = class animatable_keyframe_rend
 		this.is_playing = false
 	}
 	before_draw() {
-		if (this.is_playing == false) { return }
+		if (this.is_playing === false) { return }
 		if (this.animation.now > this.animation.end) { stop(); return }
 		let now = Date.now()
 		let delta_time = now - this.last_time
@@ -571,7 +571,7 @@ globalThis.rectangle = class rectangle {
 	 * @param {location2D} size the size of the rectangle in width and height
 	 */
 	constructor(size) {
-		if (size == undefined) {
+		if (size === undefined) {
 			size = new location2D(1, 1)
 		} else {
 			this.size = size
@@ -582,7 +582,7 @@ globalThis.rectangle = class rectangle {
 		return ["shape.size.x", "shape.size.y"]
 	}
 	set_animatable_attributes(key, value) {
-		if (value == undefined) {
+		if (value === undefined) {
 			return
 		}
 
@@ -631,7 +631,7 @@ globalThis.text_shape = class text_shape {
 		return ["shape.text", "shape.textAlign", "shape.sizeType", "shape.size"]
 	}
 	set_animatable_attributes(key, value) {
-		if (value == undefined) {
+		if (value === undefined) {
 			return
 		}
 
@@ -802,10 +802,10 @@ globalThis.camera = class camera extends base {
 					break;
 				case text_shape:
 					ctx_context.fillStyle = A_render_component.colour //select color
-					if (A_render_component.shape.size == "height") {
+					if (A_render_component.shape.size === "height") {
 						ctx_context.font = `${(b_size_y * A_render_component.shape.height * 1.4) - 1}px monospace`
 					}
-					if (A_render_component.shape.size == "width") {
+					if (A_render_component.shape.size === "width") {
 						ctx_context.font = `${b_size_x * ((A_render_component.shape.width / A_render_component.shape.text.length) * 1.70)}px monospace`
 					}
 					ctx_context.textAlign = A_render_component.shape.textAlign
@@ -905,7 +905,7 @@ globalThis.check = (location, The_world, self_) => {
  * only checks if the location is out of the world 'size'
  */
 globalThis.check_out_of_world = (location, The_world) => {
-	if (The_world.size == undefined) {
+	if (The_world.size === undefined) {
 		return true
 	}
 	is_out_of_world =
@@ -960,7 +960,7 @@ globalThis.rotation2D = class rotation2D {
 	//var x = (Number.NaN)
 	//var y = (Number.NaN)
 	is_equal(other) {
-		return other.z == this.z
+		return other.z === this.z
 	}
 	add(other) {
 		return new location2D(this.z + other.z)
