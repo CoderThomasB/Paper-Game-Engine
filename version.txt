@@ -1,6 +1,5 @@
-M.1.0.3
+M.0.4
 
 Release Letter (M for multiPlayer)
-Major Number
 Minor Number (not compatible)
 Minor Number (compatible)
