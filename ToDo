@@ -2,8 +2,11 @@ improve the map editor - a Lot!
 	exporting of maps
 	create a good work flow
 
+make multiplayer use WebSockets instead of http for faster communication
+
 improve multiplayer performers by
 	changing the way the the world is replicated -
 	instead of sending the render data, send the changes to the world with the client keeping a copy
+	Need to have a toJSON on objects because JSON.stringify isn't good at its job
 
 improve the documentation - a lot!
