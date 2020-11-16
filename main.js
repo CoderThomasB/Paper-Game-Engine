@@ -1,3 +1,8 @@
+/*
+The Paper Game Engine by Thomas Booker is licensed under CC BY 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0
+see the LICENSE file
+*/
+
 
 globalThis.location2D = class location2D {
 	/**
@@ -14,7 +19,7 @@ globalThis.location2D = class location2D {
 	 * @returns {location2D}
 	 */
 	is_equal(other) {
-		return other.x == this.x && other.y == this.y
+		return other.x === this.x && other.y === this.y
 	}
 	/**
 	 * @param {location2D} other
@@ -111,7 +116,7 @@ globalThis.world = class world {
 	get_in_grid(object) {
 		var a;
 		for (var x = 0; x < this.grid.length; x++) {
-			if (object == this.grid[x]) {
+			if (object === this.grid[x]) {
 				a = x
 			}
 
@@ -257,6 +262,194 @@ globalThis.sound_component = class sound_component {
 	}
 }
 
+/* animation example var 'a = new animation([
+	new keyframe(0, "a", 2, keyframe_types.liner),
+	new keyframe(10, "a", 3, keyframe_types.liner),
+	new keyframe(20, "a", -1, keyframe_types.liner)
+	], 0, 20)'
+*/
+/*
+	var _ = new animation([
+		new keyframe(0, "x", 0, keyframe_types.liner),
+		new keyframe(175, "x", 9, keyframe_types.liner),
+		new keyframe(200, "x", 0, keyframe_types.liner)
+		], 0, 200)
+*/
+
+globalThis.animation = class animation {
+	/**
+	 * 
+	 * @param {Array<keyframe>} keyframes 
+	 * @param {Number} start
+	 * @param {Number} end
+	 */
+	constructor(keyframes, start, end) {
+		this.keyframes = keyframes
+		this.now = start
+		this.start = start
+		this.end = end
+	}
+	/**
+	 * goes to the start of the animation
+	 */
+	goto_start() {
+		this.now = this.start
+		return this.now
+	}
+	/**
+	 * goes to the end of the animation
+	 */
+	goto_end() {
+		this.now = this.end
+		return this.now
+	}
+	/**
+	 * step 1 time unit forward
+	 */
+	step() {
+		this.now += 1
+		return this.now
+	}
+	/**
+	 * gets all the keyframes with an attribute
+	 * @param {String} attribute the attribute that the keyframes will match
+	 */
+	get_keyframes_with_attribute(attribute) {
+		let _ = []
+		this.keyframes.forEach((keyframe) => {
+			if (keyframe.attribute === attribute) {
+				_.push(keyframe)
+			}
+		})
+		return _
+	}
+	/**
+	 * logs the values at every integer time white an attribute
+	 * @param {String} attribute the attribute of the keyframes to log
+	 */
+	console_log(attribute) {
+		this.goto_start()
+		// i use '<=' because liner key frames need to finish
+		while (this.now <= this.end) {
+			console.log(this.now + " : " + this.get_attribute_value_now(attribute))
+			this.step()
+		}
+	}
+	/**
+	 * apply the animation to an object. the attributes will be mapped to the objects key and the value writhen accordantly
+	 * Mite not work curtly at the time of this commit.
+	 * @param {*} object the object to animation
+	 */
+	apply_animation(object, step_intervale) {
+		this.goto_start()
+		// i use '<=' because liner key frames need to finish
+		var me = this
+		var _ = () => {
+			if (me.now <= me.end) {
+				Object.keys(object).forEach((key) => {
+					let value = me.get_attribute_value_now(key)
+					if (value === undefined) {
+						return
+					} else {
+						object[key] = value
+					}
+				})
+				me.step()
+			} else {
+				clearImmediate(Interval)
+			}
+		}
+		var Interval = setInterval(_, step_intervale);
+	}
+	/**
+	 * gets the value of an attribute at the 'now' frame
+	 * @param {String} attribute 
+	 */
+	get_attribute_value_now(attribute) {
+		let options = this.get_keyframes_with_attribute(attribute)
+		if (options.length === 0) {
+			return undefined
+		}
+		let closet_keyframe_behind = undefined
+		let closet_keyframe_ahead = undefined
+		options.forEach((keyframe) => {
+			if (keyframe.time <= this.now) {
+				if (closet_keyframe_behind === undefined) {
+					closet_keyframe_behind = keyframe
+					return
+				}
+				if (keyframe.time >= closet_keyframe_behind.time) {
+					closet_keyframe_behind = keyframe
+					return
+				}
+			} else {
+				if (closet_keyframe_ahead === undefined) {
+					closet_keyframe_ahead = keyframe
+					return
+				}
+				if (keyframe.time < closet_keyframe_ahead.time) {
+					closet_keyframe_ahead = keyframe
+					return
+				}
+			}
+		})
+		if (closet_keyframe_behind === undefined) {
+			return undefined
+		}
+		if (closet_keyframe_behind.type === keyframe_types.snap) {
+			return closet_keyframe_behind.value
+		}
+		if (closet_keyframe_behind.type === keyframe_types.liner) {
+			if (closet_keyframe_ahead === undefined) {
+				return closet_keyframe_behind.value
+			}
+			let behind_length = this.now - closet_keyframe_behind.time
+			let ahead_length = closet_keyframe_ahead.time - this.now
+			let ahead_value = closet_keyframe_ahead.value
+			let behind_value = closet_keyframe_behind.value
+			let distance = behind_length + ahead_length
+
+
+
+			return (
+				(
+					behind_value * ahead_length
+				)
+				+
+				(
+					ahead_value * behind_length
+				)
+			) / distance
+
+		}
+	}
+
+}
+
+globalThis.keyframe_types = {
+	"snap": 1,
+	"liner": 2
+}
+
+globalThis.keyframe = class keyframe {
+	/**
+	 * 
+	 * @param {Number} time 
+	 * @param {String} attribute 
+	 * @param {Any} value 
+	 */
+	constructor(time, attribute, value, type = keyframe_types.snap) {
+		if (type === keyframe_types.liner) {
+			if (value.constructor != Number) {
+				throw new error("can not be liner if value not a number")
+			}
+		}
+		this.time = time
+		this.attribute = attribute
+		this.value = value
+		this.type = type
+	}
+}
 
 globalThis.render_component = class render_component extends base_component {
 	/**
@@ -271,6 +464,106 @@ globalThis.render_component = class render_component extends base_component {
 		this.colour = colour
 		this.img = undefined
 	}
+	before_draw() {
+
+	}
+}
+
+globalThis.animatable_function_render_component = class animatable_function_render_component extends render_component {
+	/**
+	 * 
+	 * @param {Object} shape the shape of the component
+	 * @param {String} colour the colour of the component
+	 * @param {function(animatable_function_render_component): void} animation_function - take in the object and changes it - do not use last_time instead use now
+	 * @param {boolean} play_on_creation 
+	 */
+	constructor(shape, colour, animation_function, start, end, play_on_creation = false) {
+		super(shape, colour)
+		this.animation_function = animation_function
+		this.start = start
+		this.end = end
+		if (play_on_creation) {
+			this.play()
+		} else {
+			this.stop()
+		}
+	}
+	play() {
+		this.last_time = Date.now()
+		this.is_playing = true
+		this.now = this.start
+	}
+	stop() {
+		this.is_playing = false
+	}
+	before_draw(){
+		if (this.is_playing === false) { return }
+		if (this.now > this.end) { stop(); return }
+		let now = Date.now()
+		let delta_time = now - this.last_time
+		this.now += delta_time
+		this.last_time = now
+
+		var _ = this
+		this.animation_function(_)
+	}
+}
+
+globalThis.animatable_keyframe_render_component = class animatable_keyframe_render_component extends render_component {
+	/**
+	 * 
+	 * @param {Object} shape the shape of the component
+	 * @param {String} colour the colour of the component
+	 * @param {Animation} animation 
+	 * @param {boolean} play_on_creation 
+	 */
+	constructor(shape, colour, animation, play_on_creation = false) {
+		super(shape, colour)
+		this.animation = animation
+		if (play_on_creation) {
+			this.play()
+		} else {
+			this.stop()
+		}
+	}
+	play() {
+		this.last_time = Date.now()
+		this.is_playing = true
+		this.animation.goto_start()
+	}
+	stop() {
+		this.is_playing = false
+	}
+	before_draw() {
+		if (this.is_playing === false) { return }
+		if (this.animation.now > this.animation.end) { stop(); return }
+		let now = Date.now()
+		let delta_time = now - this.last_time
+		this.animation.now += delta_time
+		this.last_time = now
+
+		let offset_x = this.animation.get_attribute_value_now("offset.x")
+		let offset_y = this.animation.get_attribute_value_now("offset.y")
+
+		let use_colour_or_img = this.animation.get_attribute_value_now("use_colour_or_img")
+
+		let colour = this.animation.get_attribute_value_now("colour")
+		let img = this.animation.get_attribute_value_now("img")
+
+		if (offset_x != undefined) { this.offset.x = offset_x }
+		if (offset_y != undefined) { this.offset.y = offset_y }
+
+		if (use_colour_or_img != undefined) { this.use_colour_or_img = use_colour_or_img }
+
+		if (colour != undefined) { this.colour = colour }
+
+		if (img != undefined) { this.img = img }
+
+		this.shape.get_animatable_attributes().forEach((attribute) => {
+			let _ = this.animation.get_attribute_value_now(attribute)
+			this.shape.set_animatable_attributes(attribute, _)
+		})
+	}
 }
 
 globalThis.rectangle = class rectangle {
@@ -278,10 +571,27 @@ globalThis.rectangle = class rectangle {
 	 * @param {location2D} size the size of the rectangle in width and height
 	 */
 	constructor(size) {
-		if (size == undefined) {
+		if (size === undefined) {
 			size = new location2D(1, 1)
 		} else {
 			this.size = size
+		}
+	}
+
+	get_animatable_attributes() {
+		return ["shape.size.x", "shape.size.y"]
+	}
+	set_animatable_attributes(key, value) {
+		if (value === undefined) {
+			return
+		}
+
+		if (key === "shape.size.x") {
+			this.size.x = value
+		}
+
+		if (key === "shape.size.y") {
+			this.size.y = value
 		}
 	}
 }
@@ -315,6 +625,37 @@ globalThis.text_shape = class text_shape {
 		console.log("width")
 		this.size = "width"
 		this.width = value
+	}
+
+	get_animatable_attributes() {
+		return ["shape.text", "shape.textAlign", "shape.sizeType", "shape.size"]
+	}
+	set_animatable_attributes(key, value) {
+		if (value === undefined) {
+			return
+		}
+
+		if (key === "shape.text" && value.constructor === String) {
+			this.text = value
+		}
+
+		if (key === "shape.textAlign" && value.constructor === String) {
+			this.textAlign = value
+		}
+
+		if (key === "shape.sizeType" && value.constructor === String) {
+			if (value === "height" || value === "width") {
+				this.size = value
+			}
+		}
+
+		if (key === "shape.size" && value.constructor === Number) {
+			if (this.size == "width") {
+				this.width = value
+			} else {
+				this.height = value
+			}
+		}
 	}
 }
 
@@ -418,12 +759,17 @@ globalThis.camera = class camera extends base {
 		ctx_context.clearRect(0, 0, xs, ys)
 
 
-		var draw_element = function (A_render_component, thing) {
+		var draw_element = (A_render_component, thing) => {
 
 			var x = thing.location.x
 			var y = thing.location.y
 			try {
 				thing.before_draw()
+			} catch (error) {
+				console.error(error)
+			}
+			try {
+				A_render_component.before_draw()
 			} catch (error) {
 				console.error(error)
 			}
@@ -456,10 +802,10 @@ globalThis.camera = class camera extends base {
 					break;
 				case text_shape:
 					ctx_context.fillStyle = A_render_component.colour //select color
-					if (A_render_component.shape.size == "height") {
+					if (A_render_component.shape.size === "height") {
 						ctx_context.font = `${(b_size_y * A_render_component.shape.height * 1.4) - 1}px monospace`
 					}
-					if (A_render_component.shape.size == "width") {
+					if (A_render_component.shape.size === "width") {
 						ctx_context.font = `${b_size_x * ((A_render_component.shape.width / A_render_component.shape.text.length) * 1.70)}px monospace`
 					}
 					ctx_context.textAlign = A_render_component.shape.textAlign
@@ -559,7 +905,7 @@ globalThis.check = (location, The_world, self_) => {
  * only checks if the location is out of the world 'size'
  */
 globalThis.check_out_of_world = (location, The_world) => {
-	if (The_world.size == undefined) {
+	if (The_world.size === undefined) {
 		return true
 	}
 	is_out_of_world =
@@ -603,6 +949,10 @@ globalThis.directions = {
  * Not Finished - Do Not Use
  */
 globalThis.rotation2D = class rotation2D {
+
+	/**
+	 * Not Finished - Do Not Use
+	 */
 	constructor(z = Number.NaN) {
 		this.z = z
 	}
@@ -610,7 +960,7 @@ globalThis.rotation2D = class rotation2D {
 	//var x = (Number.NaN)
 	//var y = (Number.NaN)
 	is_equal(other) {
-		return other.z == this.z
+		return other.z === this.z
 	}
 	add(other) {
 		return new location2D(this.z + other.z)
@@ -633,3 +983,22 @@ try {
 } catch (error) {
 	console.log("Web Browser")
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+console.log("this is on line 999. and it has not hade an error!")

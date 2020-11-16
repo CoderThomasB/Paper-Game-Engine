@@ -7,7 +7,7 @@
 	<script type="text/javascript" src="main.js"></script>
 	<script>
 		The_world = new world()
-		The_camera = new camera(The_world, new location2D(0, 0), document.getElementsByTagName("canvas")[0], new location2D(10, 10))
+		The_camera = new camera(The_world, new location2D(0, 0), document.getElementsByTagName("canvas")[0], new location2D(11, 11))
 
 		The_Test = new visible(The_world, new location2D(1, 1))
 
@@ -16,6 +16,49 @@
 		}
 
 		draw = setInterval(Test, 10)
+
+		function test_keyframe_animation() {
+			// these animations are vary exaggerated you would want to use apply_animation not animatable render component because it dons not change the object location
+
+			x_min = 1
+			y_min = 1
+			x_max = 9
+			y_max = 9
+			var a = new animation([
+				new keyframe(0, "offset.x", x_min, keyframe_types.liner),
+				new keyframe(0, "offset.y", y_min, keyframe_types.liner),
+
+				new keyframe(250, "offset.x", x_max, keyframe_types.liner),
+				new keyframe(250, "offset.y", y_min, keyframe_types.liner),
+
+				new keyframe(500, "offset.x", x_max, keyframe_types.liner),
+				new keyframe(500, "offset.y", y_max, keyframe_types.liner),
+
+				new keyframe(750, "offset.x", x_min, keyframe_types.liner),
+				new keyframe(750, "offset.y", y_max, keyframe_types.liner),
+
+				new keyframe(1000, "offset.x", x_min, keyframe_types.liner),
+				new keyframe(1000, "offset.y", y_min, keyframe_types.liner),
+			], 0, 1000)
+			The_Test.location.x = 0
+			The_Test.location.y = 0
+			The_Test.visible[0] = new animatable_keyframe_render_component(new rectangle(new location2D(1, 1)), "#36fffc", a)
+			The_Test.visible[0].play()
+		}
+
+		function test_function_animation() {
+			// these animations are vary exaggerated you would want to use apply_animation not animatable render component because it dons not change the object location
+			var a = (the_render_component) => {
+				size = 2
+				the_render_component.offset.x = size * Math.sin((the_render_component.now / the_render_component.end) * Math.PI * 2 * 2)
+				the_render_component.offset.y = size * Math.cos((the_render_component.now / the_render_component.end) * Math.PI * 2 * 2)
+			}
+			var stop = () => { this.now = this.start }
+			The_Test.visible[0] = new animatable_function_render_component(new rectangle(new location2D(1, 1)), "#36fffc", a, 0, 2000)
+			The_Test.visible[0].play()
+			The_Test.location.x = 5
+			The_Test.location.y = 5
+		}
 
 	</script>
 </body>
