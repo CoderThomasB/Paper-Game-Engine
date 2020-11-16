@@ -18,7 +18,7 @@ you can reference the Paper Test.html for a place to start
 
 you can copy the code in the Full Example folder for a grate starting point
 
-### documentation is inbulit into the code
+### documentation is inbuilt into the code
 
 ### LICENSE
 The Paper Game Engine by Thomas Booker is licensed under CC BY 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0
