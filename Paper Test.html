@@ -60,6 +60,24 @@
 			The_Test.location.y = 5
 		}
 
+		class custom_practical extends base_practical {
+			/**
+			 * 
+			 * @param {base_practical} practical_Type 
+			 * @param {render_component[]} visible_list 
+			 * @param {Number} creation_intervale 
+			 */
+			constructor(practical_Type, visible_list, creation_intervale = 0) {
+				super(practical_Type, visible_list, creation_intervale)
+			}
+		}
+
+		function test_practical() {
+			The_Test.location.x = 5
+			The_Test.location.y = 0
+			The_Test.practical_manager = new practical_manager_component(custom_practical, The_Test.visible, 50)
+		}
+
 	</script>
 </body>
 

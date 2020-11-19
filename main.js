@@ -43,6 +43,19 @@ globalThis.location2D = class location2D {
 		return new location2D(Math.min(this.x, other.x), Math.min(this.y, other.y))
 	}
 	/**
+	 * @param {location2D | Number} other
+	 * @returns {location2D}
+	 */
+	multiply(other) {
+		if (other.constructor === location2D) {
+			return new location2D(this.x * other.x, this.y * other.y)
+		} else if (other.constructor === Number) {
+			return new location2D(this.x * other, this.y * other)
+		} else {
+			throw new Error("input is not a location2D or a Number")
+		}
+	}
+	/**
 	 * @param {location2D} other
 	 * @returns {location2D}
 	 */
@@ -244,6 +257,92 @@ globalThis.physics = class physics extends visible {
  */
 globalThis.base_component = class base_component {
 
+}
+
+/**
+ * practical are not vary efficient - pleas improve
+ */
+globalThis.practical_manager_component = class practical_manager_component extends base_component {
+	/**
+	 * 
+	 * @param {base_practical} practical_Type 
+	 * @param {render_component[]} visible_list 
+	 * @param {Number} creation_intervale 
+	 */
+	constructor(practical_Type, visible_list, creation_intervale = 0) {
+		super()
+		this.practical_Type = practical_Type
+		this.visible_list = visible_list
+		this.practicals = []
+		if (creation_intervale > 0) {
+			this.creation_intervale = setInterval(() => { this.create_practical() }, creation_intervale)
+		}
+	}
+	create_practical() {
+		let practical_Type = this.practical_Type
+		let practical = new practical_Type(this.visible_list, this)
+		//this.practicals.push(practical)
+		return practical
+	}
+}
+
+globalThis.base_practical = class base_practical {
+	/**
+	 * 
+	 * @param {render_component[]} visible_list 
+	 * @param {practical_manager_component} practical_manager
+	 */
+	constructor(visible_list, practical_manager) {
+		this.velocity = new location2D(Math.random() - 0.5, 1.5) // meshed in units per second
+		this.max_existence_time = 4000
+
+		this.practical_manager = practical_manager
+		this.attached_visible_list = visible_list
+		this.attached_render_component = new render_component(new rectangle(new location2D(0.1, 0.1)), "black")
+		this.visible_list_number = this.attached_visible_list.push(this.attached_render_component)
+		this.practical_list_number = this.practical_manager.practicals.push(this)
+		this.attached_render_component.before_draw = () => {
+			this.before_draw()
+		}
+		this.last_time = Date.now()
+		this.start_time = this.last_time
+	}
+	get_delta_time() {
+		if (this.last_time !== undefined) {
+			let delta_time = Date.now() - this.last_time
+			this.last_time = Date.now()
+			return delta_time
+		} else {
+			this.last_time = Date.now()
+			return 0
+		}
+	}
+	before_draw() {
+		let delta_time = this.get_delta_time() / 1000
+		this.attached_render_component.offset = this.attached_render_component.offset.add(this.velocity.multiply(delta_time))
+
+		if (Date.now() - this.start_time > this.max_existence_time) {
+			this.destroy()
+		}
+
+	}
+	check_and_repair_visible_list_number() {
+		if (this.attached_visible_list[this.visible_list_number] === this.attached_render_component) {
+			return true
+		} else {
+			for (let i = 0; i < this.attached_visible_list.length; i++) {
+				if (this.attached_visible_list[i] === this.attached_render_component) {
+					this.visible_list_number = i
+				}
+			}
+		}
+	}
+	destroy() {
+		this.check_and_repair_visible_list_number()
+		// this function is vary unperformed because it uses splice
+		//this.practical_manager.practicals.splice()
+		this.attached_visible_list.splice(this.visible_list_number, 1)
+	}
 }
 
 globalThis.sound_component = class sound_component {
@@ -496,7 +595,7 @@ globalThis.animatable_function_render_component = class animatable_function_rend
 	stop() {
 		this.is_playing = false
 	}
-	before_draw(){
+	before_draw() {
 		if (this.is_playing === false) { return }
 		if (this.now > this.end) { stop(); return }
 		let now = Date.now()
@@ -983,22 +1082,3 @@ try {
 } catch (error) {
 	console.log("Web Browser")
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-console.log("this is on line 999. and it has not hade an error!")
