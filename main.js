@@ -336,11 +336,11 @@ globalThis.animation = class animation {
 		}
 	}
 	/**
-	 * apply the animation to an object. the attributes will be mapped to the objects key and the value writhen accordantly
+	 * apply the animation to an object. the attributes will be mapped to the object's key and the value written accordingly
 	 * Mite not work curtly at the time of this commit.
 	 * @param {*} object the object to animation
 	 */
-	apply_animation(object, step_intervale) {
+	apply_animation(object, step_interval) {
 		this.goto_start()
 		// i use '<=' because liner key frames need to finish
 		var me = this
@@ -359,7 +359,7 @@ globalThis.animation = class animation {
 				clearImmediate(Interval)
 			}
 		}
-		var Interval = setInterval(_, step_intervale);
+		var Interval = setInterval(_, step_interval);
 	}
 	/**
 	 * gets the value of an attribute at the 'now' frame
@@ -997,8 +997,4 @@ try {
 
 
 
-
-
-
-
-console.log("this is on line 999. and it has not hade an error!")
+console.log("this is on line 1000. and it has not had an error!")
