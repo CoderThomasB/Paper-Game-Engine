@@ -11,11 +11,11 @@
 
 		The_Test = new visible(The_world, new location2D(1, 1))
 
-		function Test() {
+		function draw() {
 			The_camera.draw()
 		}
 
-		draw = setInterval(Test, 10)
+		draw_timer = setInterval(draw, 10)
 
 		function test_keyframe_animation() {
 			// these animations are vary exaggerated you would want to use apply_animation not animatable render component because it dons not change the object location
