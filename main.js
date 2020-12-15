@@ -267,15 +267,15 @@ globalThis.practical_manager_component = class practical_manager_component exten
 	 * 
 	 * @param {base_practical} practical_Type 
 	 * @param {render_component[]} visible_list 
-	 * @param {Number} creation_intervale 
+	 * @param {Number} creation_interval 
 	 */
-	constructor(practical_Type, visible_list, creation_intervale = 0) {
+	constructor(practical_Type, visible_list, creation_interval = 0) {
 		super()
 		this.practical_Type = practical_Type
 		this.visible_list = visible_list
 		this.practicals = []
-		if (creation_intervale > 0) {
-			this.creation_intervale = setInterval(() => { this.create_practical() }, creation_intervale)
+		if (creation_interval > 0) {
+			this.creation_interval = setInterval(() => { this.create_practical() }, creation_interval)
 		}
 	}
 	create_practical() {
@@ -337,11 +337,28 @@ globalThis.base_practical = class base_practical {
 			}
 		}
 	}
-	destroy() {
+	remove_frome_practicals_list(){
+		if(this.practical_manager.practicals[0] === this){
+			let _ = this.practical_manager.practicals.shift()
+			if(_ !== this){
+				console.log("AAAAAHHHHHHH!")
+			}
+			return
+		}else{
+			for (let i = 0; i < this.practical_manager.practicals.length; i++) {
+				if (this.practical_manager.practicals[i] === this) {
+					this.practical_manager.practicals.splice(i, 1)
+				}
+			}
+		}
+	}
+	remove_frome_visible_list(){
 		this.check_and_repair_visible_list_number()
-		// this function is vary unperformed because it uses splice
-		//this.practical_manager.practicals.splice()
 		this.attached_visible_list.splice(this.visible_list_number, 1)
+	}
+	destroy() {
+		this.remove_frome_practicals_list()
+		this.remove_frome_visible_list()
 	}
 }
 
@@ -1082,21 +1099,3 @@ try {
 } catch (error) {
 	console.log("Web Browser")
 }
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-console.log("this is on line 1000. and it has not had an error!")
-=======
->>>>>>> e4707e32be34015ec8edd77fd0e5f144790d9175

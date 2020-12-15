@@ -72,10 +72,14 @@
 			}
 		}
 
-		function test_practical() {
+		function test_practical(creation_interval = 50) {
+			if(The_Test.practical_manager !== undefined){
+				throw new Error("No!")
+			}
 			The_Test.location.x = 5
 			The_Test.location.y = 0
-			The_Test.practical_manager = new practical_manager_component(custom_practical, The_Test.visible, 50)
+			The_Test.visible[0] = new render_component(new rectangle(new location2D(1, 1)),"hsl(0, 0%, 80%)")
+			The_Test.practical_manager = new practical_manager_component(custom_practical, The_Test.visible, creation_interval)
 		}
 
 	</script>
