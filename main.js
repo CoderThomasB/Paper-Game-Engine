@@ -4,83 +4,272 @@ see the LICENSE file
 */
 
 
-globalThis.location2D = class location2D {
-	/**
-	 * @param {number} x
-	 * @param {number} y
-	 */
-	constructor(x = Number.NaN, y = Number.NaN) {
-		this.x = x
-		this.y = y
+globalThis.Vector2 = class Vector2 {
+	constructor(x = 0, y = 0) {
+		Object.defineProperty(this, 'isVector2', { value: true });
+		this.x = x;
+		this.y = y;
 	}
-
-	/**
-	 * @param {location2D} other
-	 * @returns {location2D}
-	 */
-	is_equal(other) {
-		return other.x === this.x && other.y === this.y
+	get width() {
+		return this.x;
 	}
-	/**
-	 * @param {location2D} other
-	 * @returns {location2D}
-	 */
-	add(other) {
-		return new location2D(this.x + other.x, this.y + other.y)
+	set width(value) {
+		this.x = value;
 	}
-	/**
-	 * @param {location2D} other
-	 * @returns {location2D}
-	 */
-	subtract(other) {
-		return new location2D(this.x - other.x, this.y - other.y)
+	get height() {
+		return this.y;
 	}
-	/**
-	 * @param {location2D} other
-	 * @returns {location2D}
-	 */
-	min(other) {
-		return new location2D(Math.min(this.x, other.x), Math.min(this.y, other.y))
+	set height(value) {
+		this.y = value;
 	}
-	/**
-	 * @param {location2D | Number} other
-	 * @returns {location2D}
-	 */
-	multiply(other) {
-		if (other.constructor === location2D) {
-			return new location2D(this.x * other.x, this.y * other.y)
-		} else if (other.constructor === Number) {
-			return new location2D(this.x * other, this.y * other)
-		} else {
-			throw new Error("input is not a location2D or a Number")
+	set(x, y) {
+		this.x = x;
+		this.y = y;
+		return this;
+	}
+	setScalar(scalar) {
+		this.x = scalar;
+		this.y = scalar;
+		return this;
+	}
+	setX(x) {
+		this.x = x;
+		return this;
+	}
+	setY(y) {
+		this.y = y;
+		return this;
+	}
+	setComponent(index, value) {
+		switch (index) {
+			case 0: this.x = value; break;
+			case 1: this.y = value; break;
+			default: throw new Error('index is out of range: ' + index);
+		}
+		return this;
+	}
+	getComponent(index) {
+		switch (index) {
+			case 0: return this.x;
+			case 1: return this.y;
+			default: throw new Error('index is out of range: ' + index);
 		}
 	}
-	/**
-	 * @param {location2D} other
-	 * @returns {location2D}
-	 */
-	max(other) {
-		return new location2D(Math.max(this.x, other.x), Math.max(this.y, other.y))
+	clone() {
+		return new this.constructor(this.x, this.y);
 	}
-	/**
-	 * @param {location2D} other
-	 * @returns {location2D}
-	 */
-	make_copy() {
-		return new location2D(this.x, this.y)
+	copy(v) {
+		this.x = v.x;
+		this.y = v.y;
+		return this;
 	}
-	/**
-	 * @param {location2D} other
-	 * @returns {location2D}
-	 */
-	toString() {
-		return `{"x": ${this.x},"y": ${this.y}}`
+	add(v, w) {
+		if (w !== undefined) {
+			console.warn('THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.');
+			return this.addVectors(v, w);
+		}
+		this.x += v.x;
+		this.y += v.y;
+		return this;
 	}
-	toJSON() {
-		return { x: this.x, y: this.y }
+	addScalar(s) {
+		this.x += s;
+		this.y += s;
+		return this;
+	}
+	addVectors(a, b) {
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+		return this;
+	}
+	addScaledVector(v, s) {
+		this.x += v.x * s;
+		this.y += v.y * s;
+		return this;
+	}
+
+	sub(v, w) {
+		if (w !== undefined) {
+			console.warn('THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.');
+			return this.subVectors(v, w);
+		}
+		this.x -= v.x;
+		this.y -= v.y;
+		return this;
+	}
+
+	subScalar(s) {
+		this.x -= s;
+		this.y -= s;
+		return this;
+	}
+
+	subVectors(a, b) {
+		this.x = a.x - b.x;
+		this.y = a.y - b.y;
+		return this;
+	}
+
+	multiply(v) {
+		this.x *= v.x;
+		this.y *= v.y;
+		return this;
+	}
+
+	multiplyScalar(scalar) {
+		this.x *= scalar;
+		this.y *= scalar;
+		return this;
+	}
+
+	divide(v) {
+		this.x /= v.x;
+		this.y /= v.y;
+		return this;
+	}
+
+	divideScalar(scalar) {
+		return this.multiplyScalar(1 / scalar);
+	}
+	applyMatrix3(m) {
+		const x = this.x, y = this.y;
+		const e = m.elements;
+		this.x = e[0] * x + e[3] * y + e[6];
+		this.y = e[1] * x + e[4] * y + e[7];
+		return this;
+	}
+	min(v) {
+		this.x = Math.min(this.x, v.x);
+		this.y = Math.min(this.y, v.y);
+		return this;
+	}
+	max(v) {
+		this.x = Math.max(this.x, v.x);
+		this.y = Math.max(this.y, v.y);
+		return this;
+	}
+	clamp(min, max) {
+		// assumes min < max, componentwise
+		this.x = Math.max(min.x, Math.min(max.x, this.x));
+		this.y = Math.max(min.y, Math.min(max.y, this.y));
+		return this;
+	}
+	clampScalar(minVal, maxVal) {
+		this.x = Math.max(minVal, Math.min(maxVal, this.x));
+		this.y = Math.max(minVal, Math.min(maxVal, this.y));
+		return this;
+	}
+	clampLength(min, max) {
+		const length = this.length();
+		return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
+	}
+	floor() {
+		this.x = Math.floor(this.x);
+		this.y = Math.floor(this.y);
+		return this;
+	}
+	ceil() {
+		this.x = Math.ceil(this.x);
+		this.y = Math.ceil(this.y);
+		return this;
+	}
+	round() {
+		this.x = Math.round(this.x);
+		this.y = Math.round(this.y);
+		return this;
+	}
+	roundToZero() {
+		this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
+		this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
+		return this;
+	}
+	negate() {
+		this.x = - this.x;
+		this.y = - this.y;
+		return this;
+	}
+	dot(v) {
+		return this.x * v.x + this.y * v.y;
+	}
+	cross(v) {
+		return this.x * v.y - this.y * v.x;
+	}
+	lengthSq() {
+		return this.x * this.x + this.y * this.y;
+	}
+	length() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	manhattanLength() {
+		return Math.abs(this.x) + Math.abs(this.y);
+	}
+	normalize() {
+		return this.divideScalar(this.length() || 1);
+	}
+	angle() {
+		// computes the angle in radians with respect to the positive x-axis
+		const angle = Math.atan2(- this.y, - this.x) + Math.PI;
+		return angle;
+	}
+	distanceTo(v) {
+		return Math.sqrt(this.distanceToSquared(v));
+	}
+	distanceToSquared(v) {
+		const dx = this.x - v.x, dy = this.y - v.y;
+		return dx * dx + dy * dy;
+	}
+	manhattanDistanceTo(v) {
+		return Math.abs(this.x - v.x) + Math.abs(this.y - v.y);
+	}
+	setLength(length) {
+		return this.normalize().multiplyScalar(length);
+	}
+	lerp(v, alpha) {
+		this.x += (v.x - this.x) * alpha;
+		this.y += (v.y - this.y) * alpha;
+		return this;
+	}
+	lerpVectors(v1, v2, alpha) {
+		this.x = v1.x + (v2.x - v1.x) * alpha;
+		this.y = v1.y + (v2.y - v1.y) * alpha;
+		return this;
+	}
+	equals(v) {
+		return ((v.x === this.x) && (v.y === this.y));
+	}
+	fromArray(array, offset = 0) {
+		this.x = array[offset];
+		this.y = array[offset + 1];
+		return this;
+	}
+	toArray(array = [], offset = 0) {
+		array[offset] = this.x;
+		array[offset + 1] = this.y;
+		return array;
+	}
+	fromBufferAttribute(attribute, index, offset) {
+		if (offset !== undefined) {
+			console.warn('THREE.Vector2: offset has been removed from .fromBufferAttribute().');
+		}
+		this.x = attribute.getX(index);
+		this.y = attribute.getY(index);
+		return this;
+	}
+
+	rotateAround(center, angle) {
+		const c = Math.cos(angle), s = Math.sin(angle);
+		const x = this.x - center.x;
+		const y = this.y - center.y;
+		this.x = x * c - y * s + center.x;
+		this.y = x * s + y * c + center.y;
+		return this;
+	}
+	random() {
+		this.x = Math.random();
+		this.y = Math.random();
+		return this;
 	}
 }
-
 
 
 globalThis.world = class world {
@@ -140,7 +329,7 @@ globalThis.world = class world {
 		return a
 	}
 	/**
-	 * @param {location2D} location
+	 * @param {Vector2} location
 	 * @param {Object} self_
 	 * @returns {Array}
 	 * gets all the object's at a location.
@@ -166,7 +355,7 @@ globalThis.world = class world {
 	constructor() {
 		this.objects = []			// a list with all the objects in it.
 		this.update_number = 0	// the number of updates that have happened.
-		this.size = undefined	// if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'.
+		this.size = undefined	// if this is a Vector2 then that is the size limit of the world from 0 to 'x' and 0 to 'y'.
 	}
 
 }
@@ -195,7 +384,7 @@ globalThis.base = class base {
 
 	/**
 	 * @param {world} New_world the world this the object is in.
-	 * @param {location2D} New_location the location of the object.
+	 * @param {Vector2} New_location the location of the object.
 	 */
 	constructor(New_world, New_location) {
 		this.this_world = New_world
@@ -213,14 +402,14 @@ globalThis.visible = class visible extends base {
 	}
 	/**
 	 * @param {world} New_world the world this the object is in.
-	 * @param {location2D} New_location the location of the object.
+	 * @param {Vector2} New_location the location of the object.
 	 */
 	constructor(New_world, New_location) {
 		super(New_world, New_location)
 
 		this.visible =
 			[new render_component(
-				new rectangle(new location2D(1, 1)),
+				new rectangle(new Vector2(1, 1)),
 				"hsl(0, 0%, 80%)"
 			)
 			]
@@ -233,7 +422,7 @@ globalThis.basic_physics = class basic_physics extends visible {
 	 * @param {Number} direction the location of the object.
 	 */
 	move(direction) {
-		this.location = this.location.add(get_direction_as_location2D(direction))
+		this.location = this.location.add(get_direction_as_Vector2(direction))
 		if (!check(this.location, this.this_world, this)) {
 			//console.log("INVALID MOVE")
 			this.move(get_opposite_direction(direction))
@@ -244,7 +433,7 @@ globalThis.basic_physics = class basic_physics extends visible {
 	}
 	/**
 	 * @param {world} New_world the world this the object is in.
-	 * @param {location2D} New_location the location of the object.
+	 * @param {Vector2} New_location the location of the object.
 	 */
 	constructor(New_world, New_location) {
 		super(New_world, New_location)
@@ -286,12 +475,12 @@ globalThis.base_practical = class base_practical {
 	 * @param {practical_emitter} practical_manager
 	 */
 	constructor(visible_list, practical_manager) {
-		this.velocity = new location2D(Math.random() - 0.5, 1.5) // meshed in units per second
+		this.velocity = new Vector2(Math.random() - 0.5, 1.5) // meshed in units per second
 		this.max_existence_time = 4000
 
 		this.practical_manager = practical_manager
 		this.attached_visible_list = visible_list
-		this.attached_render_component = new render_component(new rectangle(new location2D(0.1, 0.1)), "black")
+		this.attached_render_component = new render_component(new rectangle(new Vector2(0.1, 0.1)), "black")
 		this.visible_list_number = this.attached_visible_list.push(this.attached_render_component)
 		this.practical_list_number = this.practical_manager.practicals.push(this)
 		this.attached_render_component.before_draw = () => {
@@ -568,7 +757,7 @@ globalThis.render_component = class render_component extends base_component {
 	constructor(shape, colour) {
 		super()
 		this.shape = shape
-		this.offset = new location2D(0, 0)
+		this.offset = new Vector2(0, 0)
 		this.use_colour_or_img = colour_or_img.colour
 		this.colour = colour
 		this.img = undefined
@@ -677,11 +866,11 @@ globalThis.animatable_keyframe_render_component = class animatable_keyframe_rend
 
 globalThis.rectangle = class rectangle {
 	/**
-	 * @param {location2D} size the size of the rectangle in width and height
+	 * @param {Vector2} size the size of the rectangle in width and height
 	 */
 	constructor(size) {
 		if (size === undefined) {
-			size = new location2D(1, 1)
+			size = new Vector2(1, 1)
 		} else {
 			this.size = size
 		}
@@ -770,7 +959,7 @@ globalThis.text_shape = class text_shape {
 
 globalThis.polygon = class polygon {
 	/**
-	 * @param {Array<location2D>} points
+	 * @param {Array<Vector2>} points
 	 * @param {boolean} fill
 	 */
 	constructor(points, fill = false) {
@@ -781,7 +970,7 @@ globalThis.polygon = class polygon {
 
 globalThis.line = class line {
 	/**
-	 * @param {location2D} vector
+	 * @param {Vector2} vector
 	 */
 	constructor(vector) {
 		this.vector = vector
@@ -819,18 +1008,18 @@ globalThis.get_opposite_direction = (direction) => {
 
 /**
  * @param {number} direction
- * @returns {location2D}
+ * @returns {Vector2}
  */
-globalThis.get_direction_as_location2D = (direction) => {
+globalThis.get_direction_as_Vector2 = (direction) => {
 	switch (direction) {
 		case directions.up:
-			return new location2D(0, -1)
+			return new Vector2(0, -1)
 		case directions.down:
-			return new location2D(0, 1)
+			return new Vector2(0, 1)
 		case directions.left:
-			return new location2D(-1, 0)
+			return new Vector2(-1, 0)
 		case directions.right:
-			return new location2D(1, 0)
+			return new Vector2(1, 0)
 		default:
 			throw new DirectionTypeError()
 	}
@@ -851,9 +1040,9 @@ globalThis.Abstract_camera = class Abstract_camera extends base {
 	}
 	/**
 	 * @param {world} New_world the world this the object is in.
-	 * @param {location2D} New_location the location of the object.
+	 * @param {Vector2} New_location the location of the object.
 	 * @param {HTMLCanvasElement} ctx the Canvas used for drawing.
-	 * @param {location2D} screen_size the size of the 'screen' or render area.
+	 * @param {Vector2} screen_size the size of the 'screen' or render area.
 	 * @param {Boolean} draw_on_timed_update an option for auto drawing on timed_update.
 	 */
 	constructor(New_world, New_location, ctx, draw_on_timed_update = false) {
@@ -992,9 +1181,9 @@ globalThis.camera = class camera extends Abstract_camera {
 	}
 	/**
 	 * @param {world} New_world the world this the object is in.
-	 * @param {location2D} New_location the location of the object.
+	 * @param {Vector2} New_location the location of the object.
 	 * @param {HTMLCanvasElement} ctx the Canvas used for drawing.
-	 * @param {location2D} screen_size the size of the 'screen' or render area.
+	 * @param {Vector2} screen_size the size of the 'screen' or render area.
 	 * @param {Boolean} draw_on_timed_update an option for auto drawing on timed_update.
 	 */
 	constructor(New_world, New_location, ctx, screen_size, draw_on_timed_update = false) {
@@ -1005,7 +1194,7 @@ globalThis.camera = class camera extends Abstract_camera {
 }
 
 /**
- * @param {location2D} location the location to check.
+ * @param {Vector2} location the location to check.
  * @param {world} The_world the world to check in.
  * @param {Object} self_ the function will not included this in the output
  * @returns {Boolean}
@@ -1019,7 +1208,7 @@ globalThis.check = (location, The_world, self_) => {
 }
 
 /**
- * @param {location2D} location the location to check.
+ * @param {Vector2} location the location to check.
  * @param {world} The_world the world to check in.
  * @returns {Boolean}
  * true is valid and false is invalid
@@ -1039,7 +1228,7 @@ globalThis.check_out_of_world = (location, The_world) => {
 }
 
 /**
- * @param {location2D} location the location to check.
+ * @param {Vector2} location the location to check.
  * @param {world} The_world the world to check in.
  * @param {Object} self_ the function will not included this in the output
  * @returns {Boolean}

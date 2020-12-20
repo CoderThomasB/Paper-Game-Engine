@@ -7,15 +7,18 @@
 	<script type="text/javascript" src="main.js"></script>
 	<script>
 		The_world = new world()
-		The_camera = new camera(The_world, new location2D(0, 0), document.getElementsByTagName("canvas")[0], new location2D(11, 11))
+		The_camera = new camera(The_world, new Vector2(0, 0), document.getElementsByTagName("canvas")[0], new Vector2(11, 11))
 
-		The_Test = new visible(The_world, new location2D(1, 1))
+		The_Test = new visible(The_world, new Vector2(1, 1))
 
 		function draw() {
+			requestAnimationFrame(draw)
 			The_camera.draw()
 		}
 
-		draw_timer = setInterval(draw, 10)
+		draw()
+
+		//draw_timer = setInterval(draw, 10)
 
 		function test_keyframe_animation() {
 			// these animations are vary exaggerated you would want to use apply_animation not animatable render component because it dons not change the object location
@@ -42,7 +45,7 @@
 			], 0, 1000)
 			The_Test.location.x = 0
 			The_Test.location.y = 0
-			The_Test.visible[0] = new animatable_keyframe_render_component(new rectangle(new location2D(1, 1)), "#36fffc", a)
+			The_Test.visible[0] = new animatable_keyframe_render_component(new rectangle(new Vector2(1, 1)), "#36fffc", a)
 			The_Test.visible[0].play()
 		}
 
@@ -54,7 +57,7 @@
 				the_render_component.offset.y = size * Math.cos((the_render_component.now / the_render_component.end) * Math.PI * 2 * 2)
 			}
 			var stop = () => { this.now = this.start }
-			The_Test.visible[0] = new animatable_function_render_component(new rectangle(new location2D(1, 1)), "#36fffc", a, 0, 2000)
+			The_Test.visible[0] = new animatable_function_render_component(new rectangle(new Vector2(1, 1)), "#36fffc", a, 0, 2000)
 			The_Test.visible[0].play()
 			The_Test.location.x = 5
 			The_Test.location.y = 5
@@ -65,21 +68,25 @@
 			 * 
 			 * @param {base_practical} practical_Type 
 			 * @param {render_component[]} visible_list 
-			 * @param {Number} creation_intervale 
+			 * @param {Number} creation_interval
 			 */
-			constructor(practical_Type, visible_list, creation_intervale = 0) {
-				super(practical_Type, visible_list, creation_intervale)
+			constructor(practical_Type, visible_list, creation_interval = 0) {
+				super(practical_Type, visible_list, creation_interval)
+
+				this.max_existence_time = 4000
+
+				this.attached_render_component.colour = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
 			}
 		}
 
 		function test_practical(creation_interval = 50) {
-			if(The_Test.practical_manager !== undefined){
+			if(The_Test.practical_emitter !== undefined){
 				throw new Error("No!")
 			}
 			The_Test.location.x = 5
 			The_Test.location.y = 0
-			The_Test.visible[0] = new render_component(new rectangle(new location2D(1, 1)),"hsl(0, 0%, 80%)")
-			The_Test.practical_manager = new practical_manager_component(custom_practical, The_Test.visible, creation_interval)
+			The_Test.visible[0] = new render_component(new rectangle(new Vector2(1, 1)),"hsl(0, 0%, 80%)")
+			The_Test.practical_emitter = new practical_emitter(custom_practical, The_Test.visible, creation_interval)
 		}
 
 	</script>
