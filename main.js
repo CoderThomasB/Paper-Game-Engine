@@ -66,7 +66,7 @@ globalThis.location2D = class location2D {
 	 * @param {location2D} other
 	 * @returns {location2D}
 	 */
-	mack_copy() {
+	make_copy() {
 		return new location2D(this.x, this.y)
 	}
 	/**
@@ -75,6 +75,9 @@ globalThis.location2D = class location2D {
 	 */
 	toString() {
 		return `{"x": ${this.x},"y": ${this.y}}`
+	}
+	toJSON(){
+		return {x:this.x, y:this.y}
 	}
 }
 
@@ -87,7 +90,7 @@ globalThis.world = class world {
 	 */
 	timed_update() {
 		var me = this
-		me.grid.forEach(function (c_block) {
+		me.objects.forEach(function (c_block) {
 			try {
 				c_block.timed_update(me.update_number)
 			} catch (error) {
@@ -99,11 +102,11 @@ globalThis.world = class world {
 
 	/**
 	 * the update function is meant to update all the aspects fo all the objects can be called if something changes.
-	 * runs all the update functions in all the grid objects and adds one to the update_number.
+	 * runs all the update functions in all the objects and adds one to the update_number.
 	 */
 	update() {
 		var me = this
-		me.grid.forEach(function (c_block) {
+		me.objects.forEach(function (c_block) {
 			try {
 				c_block.update(me.update_number)
 			} catch (error) { }
@@ -115,7 +118,7 @@ globalThis.world = class world {
 	 */
 	start() {
 
-		this.grid.forEach(function (c_block) {
+		this.objects.forEach(function (c_block) {
 			c_block.start()
 
 		})
@@ -124,12 +127,12 @@ globalThis.world = class world {
 	/**
 	 * @param {Object} object
 	 * @returns {Number}
-	 * returns the number that an object has in the grid.
+	 * returns the number that an object has in the objects.
 	 */
-	get_in_grid(object) {
+	get_in_objects(object) {
 		var a;
-		for (var x = 0; x < this.grid.length; x++) {
-			if (object === this.grid[x]) {
+		for (var x = 0; x < this.objects.length; x++) {
+			if (object === this.objects[x]) {
 				a = x
 			}
 
@@ -145,7 +148,7 @@ globalThis.world = class world {
 	get_at_location(location, self_ = null) {
 
 		var b = []
-		this.grid.forEach(function (c_block) {
+		this.objects.forEach(function (c_block) {
 
 			if (c_block.location.is_equal(location)) {
 				if (self_ != c_block) {
@@ -161,7 +164,7 @@ globalThis.world = class world {
 	 * 
 	 */
 	constructor() {
-		this.grid = []			// a list with all the objects in it.
+		this.objects = []			// a list with all the objects in it.
 		this.update_number = 0	// the number of updates that have happened.
 		this.size = undefined	// if this is a location2D then that is the size limit of the world from 0 to 'x' and 0 to 'y'.
 	}
@@ -186,7 +189,7 @@ globalThis.base = class base {
 	 * this is used for deleting and removing references to the object.
 	 */
 	destroy() {
-		this.this_world.grid.splice(this.this_world.get_in_grid(this), 1)
+		this.this_world.objects.splice(this.this_world.get_in_objects(this), 1)
 		this.this_world = undefined
 	}
 
@@ -196,7 +199,7 @@ globalThis.base = class base {
 	 */
 	constructor(New_world, New_location) {
 		this.this_world = New_world
-		this.this_world.grid.push(this)
+		this.this_world.objects.push(this)
 		this.location = New_location
 	}
 }
@@ -224,7 +227,7 @@ globalThis.visible = class visible extends base {
 	}
 }
 
-globalThis.physics = class physics extends visible {
+globalThis.basic_physics = class basic_physics extends visible {
 	/**
 	 * moves the object in a direction but not in to solid object (triggers an update)
 	 * @param {Number} direction the location of the object.
@@ -252,22 +255,12 @@ globalThis.physics = class physics extends visible {
 
 }
 
-/**
- * component system is not complete yet
- */
-globalThis.base_component = class base_component {
-
-}
-
-/**
- * practical are not vary efficient - pleas improve
- */
-globalThis.practical_manager_component = class practical_manager_component extends base_component {
+globalThis.practical_emitter = class practical_emitter extends base_component {
 	/**
 	 * 
 	 * @param {base_practical} practical_Type 
 	 * @param {render_component[]} visible_list 
-	 * @param {Number} creation_interval 
+	 * @param {Number} creation_interval
 	 */
 	constructor(practical_Type, visible_list, creation_interval = 0) {
 		super()
@@ -290,7 +283,7 @@ globalThis.base_practical = class base_practical {
 	/**
 	 * 
 	 * @param {render_component[]} visible_list 
-	 * @param {practical_manager_component} practical_manager
+	 * @param {practical_emitter} practical_manager
 	 */
 	constructor(visible_list, practical_manager) {
 		this.velocity = new location2D(Math.random() - 0.5, 1.5) // meshed in units per second
@@ -850,14 +843,28 @@ globalThis.DirectionTypeError = class DirectionTypeError extends TypeError {
 	}
 }
 
-
-globalThis.camera = class camera extends base {
-
+globalThis.Abstract_camera = class Abstract_camera extends base{
 	timed_update(x) {
 		if (this.draw_on_timed_update) {
 			this.draw()
 		}
 	}
+	/**
+	 * @param {world} New_world the world this the object is in.
+	 * @param {location2D} New_location the location of the object.
+	 * @param {HTMLCanvasElement} ctx the Canvas used for drawing.
+	 * @param {location2D} screen_size the size of the 'screen' or render area.
+	 * @param {Boolean} draw_on_timed_update an option for auto drawing on timed_update.
+	 */
+	constructor(New_world, New_location, ctx, draw_on_timed_update = false) {
+		super(New_world, New_location)
+
+		this.ctx = ctx
+		this.draw_on_timed_update = draw_on_timed_update
+	}
+}
+
+globalThis.camera = class camera extends Abstract_camera {
 	/**
 	 * draws the world to the ctx
 	 */
@@ -974,7 +981,7 @@ globalThis.camera = class camera extends base {
 
 		}
 
-		this.this_world.grid.forEach(function (c_block) {
+		this.this_world.objects.forEach(function (c_block) {
 			if (c_block.visible != undefined) {
 				//console.log(c_block.visible)
 				c_block.visible.forEach((A_render_component) => {
@@ -991,11 +998,9 @@ globalThis.camera = class camera extends base {
 	 * @param {Boolean} draw_on_timed_update an option for auto drawing on timed_update.
 	 */
 	constructor(New_world, New_location, ctx, screen_size, draw_on_timed_update = false) {
-		super(New_world, New_location)
+		super(New_world, New_location, ctx, draw_on_timed_update)
 
-		this.ctx = ctx
 		this.screen_size = screen_size
-		this.draw_on_timed_update = draw_on_timed_update
 	}
 }
 
@@ -1059,37 +1064,6 @@ globalThis.directions = {
 	right: 2,
 	down: 3,
 	left: 4,
-}
-
-/**
- * Not Finished - Do Not Use
- */
-globalThis.rotation2D = class rotation2D {
-
-	/**
-	 * Not Finished - Do Not Use
-	 */
-	constructor(z = Number.NaN) {
-		this.z = z
-	}
-
-	//var x = (Number.NaN)
-	//var y = (Number.NaN)
-	is_equal(other) {
-		return other.z === this.z
-	}
-	add(other) {
-		return new location2D(this.z + other.z)
-	}
-	mack_copy() {
-		return new location2D(this.z)
-	}
-	in_degrees() {
-		return this.z
-	}
-	in_radians() {
-		return (this.z / 180) * Maths.PI
-	}
 }
 
 // Checks if running in node or web browser
