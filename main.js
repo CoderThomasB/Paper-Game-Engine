@@ -337,14 +337,14 @@ globalThis.base_practical = class base_practical {
 			}
 		}
 	}
-	remove_frome_practicals_list(){
-		if(this.practical_manager.practicals[0] === this){
+	remove_frome_practicals_list() {
+		if (this.practical_manager.practicals[0] === this) {
 			let _ = this.practical_manager.practicals.shift()
-			if(_ !== this){
+			if (_ !== this) {
 				console.log("AAAAAHHHHHHH!")
 			}
 			return
-		}else{
+		} else {
 			for (let i = 0; i < this.practical_manager.practicals.length; i++) {
 				if (this.practical_manager.practicals[i] === this) {
 					this.practical_manager.practicals.splice(i, 1)
@@ -352,7 +352,7 @@ globalThis.base_practical = class base_practical {
 			}
 		}
 	}
-	remove_frome_visible_list(){
+	remove_frome_visible_list() {
 		this.check_and_repair_visible_list_number()
 		this.attached_visible_list.splice(this.visible_list_number, 1)
 	}
