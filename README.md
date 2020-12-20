@@ -17,8 +17,8 @@ you can reference the Paper Test.html for a place to start
 4. create an html file that includes the Client.js in the Multi-Player folder along with any "add-ons" you want which are in the Add-ons folder
 you can look at the code in the Full Example folder for a grate starting point
 
-#### credit
-##### Three.js
+### credit
+#### Three.js
 Three.js is an awesome js project that creating a excellent 3D render using WebGL.
 The 3D work in progress version relies heavily on three.js and the Vector2 used in paper is from the Project!
 The Project is open source so I encourage you to check it out.
