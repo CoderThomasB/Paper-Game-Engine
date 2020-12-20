@@ -76,8 +76,8 @@ globalThis.location2D = class location2D {
 	toString() {
 		return `{"x": ${this.x},"y": ${this.y}}`
 	}
-	toJSON(){
-		return {x:this.x, y:this.y}
+	toJSON() {
+		return { x: this.x, y: this.y }
 	}
 }
 
@@ -843,7 +843,7 @@ globalThis.DirectionTypeError = class DirectionTypeError extends TypeError {
 	}
 }
 
-globalThis.Abstract_camera = class Abstract_camera extends base{
+globalThis.Abstract_camera = class Abstract_camera extends base {
 	timed_update(x) {
 		if (this.draw_on_timed_update) {
 			this.draw()
