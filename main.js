@@ -401,7 +401,7 @@ globalThis.visible = class visible extends base {
 
 	}
 	/**
-	 * @param {world} New_world the world this the object is in.
+	 * @param {world} New_world the world that the object is in.
 	 * @param {Vector2} New_location the location of the object.
 	 */
 	constructor(New_world, New_location) {
