@@ -422,7 +422,7 @@ globalThis.basic_physics = class basic_physics extends visible {
 	 * @param {Number} direction the location of the object.
 	 */
 	move(direction) {
-		this.location = this.location.add(get_direction_as_Vector2(direction))
+		this.location.add(get_direction_as_Vector2(direction))
 		if (!check(this.location, this.this_world, this)) {
 			//console.log("INVALID MOVE")
 			this.move(get_opposite_direction(direction))
@@ -444,7 +444,7 @@ globalThis.basic_physics = class basic_physics extends visible {
 
 }
 
-globalThis.practical_emitter = class practical_emitter extends base_component {
+globalThis.practical_emitter = class practical_emitter {
 	/**
 	 * 
 	 * @param {base_practical} practical_Type 
@@ -452,7 +452,6 @@ globalThis.practical_emitter = class practical_emitter extends base_component {
 	 * @param {Number} creation_interval
 	 */
 	constructor(practical_Type, visible_list, creation_interval = 0) {
-		super()
 		this.practical_Type = practical_Type
 		this.visible_list = visible_list
 		this.practicals = []
@@ -475,7 +474,8 @@ globalThis.base_practical = class base_practical {
 	 * @param {practical_emitter} practical_manager
 	 */
 	constructor(visible_list, practical_manager) {
-		this.velocity = new Vector2(Math.random() - 0.5, 1.5) // meshed in units per second
+		this.velocity = new Vector2(Math.random() - 0.5, 1) // meshed in units per second
+		this.velocity.normalize().multiplyScalar(2)
 		this.max_existence_time = 4000
 
 		this.practical_manager = practical_manager
@@ -501,7 +501,7 @@ globalThis.base_practical = class base_practical {
 	}
 	before_draw() {
 		let delta_time = this.get_delta_time() / 1000
-		this.attached_render_component.offset = this.attached_render_component.offset.add(this.velocity.multiply(delta_time))
+		this.attached_render_component.offset.add(this.velocity.clone().multiplyScalar(delta_time))
 
 		if (Date.now() - this.start_time > this.max_existence_time) {
 			this.destroy()
@@ -749,13 +749,12 @@ globalThis.keyframe = class keyframe {
 	}
 }
 
-globalThis.render_component = class render_component extends base_component {
+globalThis.render_component = class render_component {
 	/**
 	 * @param {Object} shape the shape of the component
 	 * @param {String} colour the colour of the component
 	 */
 	constructor(shape, colour) {
-		super()
 		this.shape = shape
 		this.offset = new Vector2(0, 0)
 		this.use_colour_or_img = colour_or_img.colour
