@@ -278,7 +278,7 @@ globalThis.world = class world {
 	 * timed_update is meant for being called at an interval to stop infinite updates.
 	 */
 	timed_update() {
-		this.objects.forEach((element) => {
+		this.All_objects.forEach((element) => {
 			try {
 				element.timed_update(this.update_number)
 			} catch (error) { }
@@ -291,7 +291,7 @@ globalThis.world = class world {
 	 * runs all the update functions in all the objects and adds one to the update_number.
 	 */
 	update() {
-		this.objects.forEach((element, index) => {
+		this.All_objects.forEach((element, index) => {
 			try {
 				element.update(this.update_number)
 			} catch (error) { }
@@ -302,7 +302,7 @@ globalThis.world = class world {
 	 * can be called when the all the things are setup is smiler to the update function but is only meant to be used once.
 	 */
 	start() {
-		this.objects.forEach((element, index) => {
+		this.All_objects.forEach((element, index) => {
 			element.start()
 		})
 	}
@@ -315,7 +315,7 @@ globalThis.world = class world {
 	get_at_location(location, self_ = null) {
 
 		var _ = new Set()
-		this.objects.forEach((element, index) => {
+		this.All_objects.forEach((element, index) => {
 			if (element.get_true_location().equals(location)) {
 				if (element !== self_) {
 					_.add(element)
@@ -324,9 +324,16 @@ globalThis.world = class world {
 		})
 		return _
 	}
-	/**
-	 * 
-	 */
+	get All_objects() {
+		var _ = new Set()
+		this.objects.forEach((element, index) => {
+			try {
+				_ = new Set([..._, ...element.All_objects])
+			} catch (e) { }
+			_.add(element)
+		})
+		return _
+	}
 	constructor() {
 		this.objects = new Set()// a Set with all the objects in it.
 		this.update_number = 0	// the number of updates that have happened.
