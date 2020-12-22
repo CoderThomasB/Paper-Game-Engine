@@ -73,6 +73,9 @@
 			constructor(practical_Type, visible_list, creation_interval = 0) {
 				super(practical_Type, visible_list, creation_interval)
 
+				this.velocity = new Vector2(Math.random() - 0.5, 1) // meshed in units per second
+				this.velocity.normalize().multiplyScalar(2)
+
 				this.max_existence_time = 4000
 
 				this.attached_render_component.colour = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
@@ -80,12 +83,12 @@
 		}
 
 		function test_practical(creation_interval = 50) {
-			if(The_Test.practical_emitter !== undefined){
-				throw new Error("No!")
+			if (The_Test.practical_emitter !== undefined) {
+				throw new Error("Practical Emitter is already defined and trying to add another would be a bad idea!")
 			}
 			The_Test.location.x = 5
 			The_Test.location.y = 0
-			The_Test.visible[0] = new render_component(new rectangle(new Vector2(1, 1)),"hsl(0, 0%, 80%)")
+			The_Test.visible[0] = new render_component(new rectangle(new Vector2(1, 1)), "hsl(0, 0%, 80%)")
 			The_Test.practical_emitter = new practical_emitter(custom_practical, The_Test.visible, creation_interval)
 		}
 

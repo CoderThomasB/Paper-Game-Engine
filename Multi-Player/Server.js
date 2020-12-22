@@ -64,9 +64,20 @@ globalThis.cameraLink = class cameraLink extends base {
 			let me = this
 
 
-			this.this_world.grid.forEach(function (c_block) {
+			this.Containing_World.All_objects.forEach(function (c_block) {
+
+				var x = c_block.get_true_location().x
+				var y = c_block.get_true_location().y
+
+				var my_x = me.get_true_location().x
+				var my_y = me.get_true_location().y
+
 				if (c_block.visible != undefined) {
 					c_block.visible.forEach((A_render_component) => {
+
+						var offset_x = A_render_component.offset.x
+						var offset_y = A_render_component.offset.y
+
 						var draw_data_Now =
 						{
 							use_colour_or_img: A_render_component.use_colour_or_img,
@@ -74,8 +85,8 @@ globalThis.cameraLink = class cameraLink extends base {
 							colour: A_render_component.colour,
 							shape_type: A_render_component.shape.constructor.name,
 							location: [
-								(c_block.location.x + A_render_component.offset.x - me.location.x),
-								(c_block.location.y + A_render_component.offset.y - me.location.y),
+								(x + offset_x - my_x),
+								(y + offset_y - my_y),
 							]
 						}
 						switch (A_render_component.shape.constructor) {
@@ -98,16 +109,16 @@ globalThis.cameraLink = class cameraLink extends base {
 								break
 							case line:
 								draw_data_Now.shape_data.vector = [
-									(c_block.location.x + A_render_component.offset.x - me.location.x + A_render_component.shape.vector.x),
-									(c_block.location.y + A_render_component.offset.y - me.location.y + A_render_component.shape.vector.y)]
+									(x + offset_x - my_x + A_render_component.shape.vector.x),
+									(y+ offset_y - my_y + A_render_component.shape.vector.y)]
 								break
 							case polygon:
 								draw_data_Now.shape_data = {}
 								draw_data_Now.shape_data.points = []
 								for (let i = 0; i < A_render_component.shape.points.length; i++) {
 									draw_data_Now.shape_data.points[i] = [
-										(c_block.location.x + A_render_component.offset.x - me.location.x + A_render_component.shape.points[i].x),
-										(c_block.location.y + A_render_component.offset.y - me.location.y + A_render_component.shape.points[i].y)
+										(x + offset_x - my_x + A_render_component.shape.points[i].x),
+										(y + offset_y - my_y + A_render_component.shape.points[i].y)
 									]
 								}
 								draw_data_Now.shape_data.fill = A_render_component.shape.fill

@@ -9,13 +9,14 @@ app.use(cors())
 
 var port = 27635
 
-class player_object extends physics {
+class player_object extends basic_physics {
 	constructor(New_world, New_location, the_Player_interface) {
 		super(New_world, New_location)
 		this.Player_interface = the_Player_interface
 	}
 	update() {
-		this.Player_interface.the_cameraLink.location = this.location.add(new location2D(-5, -5))
+		console.log(this.Player_interface.the_cameraLink.location)
+		this.Player_interface.the_cameraLink.location = this.location.clone().add(new Vector2(-5, -5))
 	}
 }
 
@@ -25,8 +26,8 @@ class custom_Player_interface extends Player_interface {
 
 		this.move_ActionLink = new ActionLink_component(app, this.get_move_ActionLink_url(), this.move_Action)
 		this.move_ActionLink.parent = this
-		this.player_object = new player_object(the_world, new location2D(5, 5), this)
-		this.the_cameraLink = new cameraLink(the_world, new location2D(0, 0), new location2D(11, 11), app, this.get_camera_url())
+		this.player_object = new player_object(the_world, new Vector2(5, 5), this)
+		this.the_cameraLink = new cameraLink(the_world, new Vector2(0, 0), new Vector2(11, 11), app, this.get_camera_url())
 
 		
 		/*this.player_object.visible[1] = new render_component(new text_shape(this.name, 1.2, "width", "center"), "black")
@@ -76,7 +77,7 @@ class custom_Player_interface extends Player_interface {
 
 the_world = new world()
 
-span_area = new visible(the_world, new location2D(-1,-1))
+span_area = new visible(the_world, new Vector2(-1,-1))
 span_area.visible[0].colour = "rgb(31 159 197)"
 span_area.visible[0].shape.size.x = 8
 span_area.visible[0].shape.size.y = 8
@@ -84,7 +85,7 @@ span_area.visible[0].shape.size.y = 8
 
 for (let x = -100; x < 101; x += 5) {
 	for (let y = -100; y < 101; y += 5) {
-		new physics(the_world, new location2D(x, y))
+		new basic_physics(the_world, new Vector2(x, y))
 	}
 }
 

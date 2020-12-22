@@ -278,15 +278,12 @@ globalThis.world = class world {
 	 * timed_update is meant for being called at an interval to stop infinite updates.
 	 */
 	timed_update() {
-		var me = this
-		me.objects.forEach(function (c_block) {
+		this.objects.forEach((element) => {
 			try {
-				c_block.timed_update(me.update_number)
-			} catch (error) {
-
-			}
+				element.timed_update(this.update_number)
+			} catch (error) { }
 		})
-		me.update_number++
+		this.update_number++
 	}
 
 	/**
@@ -294,39 +291,20 @@ globalThis.world = class world {
 	 * runs all the update functions in all the objects and adds one to the update_number.
 	 */
 	update() {
-		var me = this
-		me.objects.forEach(function (c_block) {
+		this.objects.forEach((element, index) => {
 			try {
-				c_block.update(me.update_number)
+				element.update(this.update_number)
 			} catch (error) { }
 		})
-		me.update_number++
+		this.update_number++
 	}
 	/**
 	 * can be called when the all the things are setup is smiler to the update function but is only meant to be used once.
 	 */
 	start() {
-
-		this.objects.forEach(function (c_block) {
-			c_block.start()
-
+		this.objects.forEach((element, index) => {
+			element.start()
 		})
-
-	}
-	/**
-	 * @param {Object} object
-	 * @returns {Number}
-	 * returns the number that an object has in the objects.
-	 */
-	get_in_objects(object) {
-		var a;
-		for (var x = 0; x < this.objects.length; x++) {
-			if (object === this.objects[x]) {
-				a = x
-			}
-
-		}
-		return a
 	}
 	/**
 	 * @param {Vector2} location
@@ -336,29 +314,27 @@ globalThis.world = class world {
 	 */
 	get_at_location(location, self_ = null) {
 
-		var b = []
-		this.objects.forEach(function (c_block) {
-
-			if (c_block.location.is_equal(location)) {
-				if (self_ != c_block) {
-					b.push(c_block)
+		var _ = new Set()
+		this.objects.forEach((element, index) => {
+			if (element.get_true_location().equals(location)) {
+				if (element !== self_) {
+					_.add(element)
 				}
-
 			}
-
 		})
-		return b
+		return _
 	}
 	/**
 	 * 
 	 */
 	constructor() {
-		this.objects = []			// a list with all the objects in it.
+		this.objects = new Set()// a Set with all the objects in it.
 		this.update_number = 0	// the number of updates that have happened.
 		this.size = undefined	// if this is a Vector2 then that is the size limit of the world from 0 to 'x' and 0 to 'y'.
 	}
 
 }
+
 globalThis.base = class base {
 	/**
 	 * this function get called when the world's start function is called.
@@ -378,18 +354,78 @@ globalThis.base = class base {
 	 * this is used for deleting and removing references to the object.
 	 */
 	destroy() {
-		this.this_world.objects.splice(this.this_world.get_in_objects(this), 1)
-		this.this_world = undefined
+		this.Parent_Container.objects.delete(this)
+		this.Parent_Container = null
 	}
 
 	/**
-	 * @param {world} New_world the world this the object is in.
+	 * @returns {World}
+	 */
+	get Containing_World() {
+		if (this.Parent_Container instanceof world) {
+			return this.Parent_Container
+		} else {
+			return this.Parent_Container.Containing_World
+		}
+	}
+
+	/**
+	 * @returns {Vector2}
+	 */
+	get_true_location() {
+		if (this.Parent_Container instanceof world) {
+			return this.location.clone()
+		} else {
+			return this.location.clone().add(this.Parent_Container.get_true_location())
+		}
+	}
+
+	/**
+	 * @param {Vector2} input
+	 * @returns {Vector2}
+	 */
+	set_true_location(input) {
+		if (this.Parent_Container instanceof world) {
+			this.location = input.clone()
+			return this.get_true_location()
+		} else {
+			this.location = input.clone().sub(this.Parent_Container.get_true_location())
+			return this.get_true_location()
+		}
+	}
+
+	/**
+	 * @param {world} The_Container the Container this the object is in.
 	 * @param {Vector2} New_location the location of the object.
 	 */
-	constructor(New_world, New_location) {
-		this.this_world = New_world
-		this.this_world.objects.push(this)
+	constructor(The_Container, New_location) {
+		this.Parent_Container = The_Container
+		this.Parent_Container.objects.add(this)
 		this.location = New_location
+	}
+}
+
+globalThis.container = class container extends base {
+	constructor(The_Container, New_location) {
+		super(The_Container, New_location)
+		this.objects = new Set()
+	}
+	add(object) {
+		if (object.Containing_World !== this.Containing_World) {
+			throw new Error("can not add a object from a different world")
+		}
+		this.objects.add(object)
+		object.Parent_Container = this
+	}
+	get All_objects() {
+		var _ = new Set()
+		this.objects.forEach((element, index) => {
+			try {
+				_ = new Set([..._, ...element.All_objects])
+			} catch (e) { }
+			_.add(element)
+		})
+		return _
 	}
 }
 
@@ -401,11 +437,11 @@ globalThis.visible = class visible extends base {
 
 	}
 	/**
-	 * @param {world} New_world the world that the object is in.
+	 * @param {world} The_Container the world that the object is in.
 	 * @param {Vector2} New_location the location of the object.
 	 */
-	constructor(New_world, New_location) {
-		super(New_world, New_location)
+	constructor(The_Container, New_location) {
+		super(The_Container, New_location)
 
 		this.visible =
 			[new render_component(
@@ -423,20 +459,20 @@ globalThis.basic_physics = class basic_physics extends visible {
 	 */
 	move(direction) {
 		this.location.add(get_direction_as_Vector2(direction))
-		if (!check(this.location, this.this_world, this)) {
+		if (!check(this.location, this.Containing_World, this)) {
 			//console.log("INVALID MOVE")
 			this.move(get_opposite_direction(direction))
 			return false
 		}
-		this.this_world.update()
+		this.Containing_World.update()
 		return true
 	}
 	/**
-	 * @param {world} New_world the world this the object is in.
+	 * @param {world} The_Container the Container this the object is in.
 	 * @param {Vector2} New_location the location of the object.
 	 */
-	constructor(New_world, New_location) {
-		super(New_world, New_location)
+	constructor(The_Container, New_location) {
+		super(The_Container, New_location)
 		this.physics = {
 			solid: true
 		}
@@ -454,7 +490,7 @@ globalThis.practical_emitter = class practical_emitter {
 	constructor(practical_Type, visible_list, creation_interval = 0) {
 		this.practical_Type = practical_Type
 		this.visible_list = visible_list
-		this.practicals = []
+		this.practicals = new Set()
 		if (creation_interval > 0) {
 			this.creation_interval = setInterval(() => { this.create_practical() }, creation_interval)
 		}
@@ -462,7 +498,6 @@ globalThis.practical_emitter = class practical_emitter {
 	create_practical() {
 		let practical_Type = this.practical_Type
 		let practical = new practical_Type(this.visible_list, this)
-		//this.practicals.push(practical)
 		return practical
 	}
 }
@@ -474,15 +509,13 @@ globalThis.base_practical = class base_practical {
 	 * @param {practical_emitter} practical_manager
 	 */
 	constructor(visible_list, practical_manager) {
-		this.velocity = new Vector2(Math.random() - 0.5, 1) // meshed in units per second
-		this.velocity.normalize().multiplyScalar(2)
-		this.max_existence_time = 4000
+		this.velocity = new Vector2() // meshed in units per second
 
 		this.practical_manager = practical_manager
 		this.attached_visible_list = visible_list
 		this.attached_render_component = new render_component(new rectangle(new Vector2(0.1, 0.1)), "black")
 		this.visible_list_number = this.attached_visible_list.push(this.attached_render_component)
-		this.practical_list_number = this.practical_manager.practicals.push(this)
+		this.practical_list_number = this.practical_manager.practicals.add(this)
 		this.attached_render_component.before_draw = () => {
 			this.before_draw()
 		}
@@ -520,19 +553,7 @@ globalThis.base_practical = class base_practical {
 		}
 	}
 	remove_frome_practicals_list() {
-		if (this.practical_manager.practicals[0] === this) {
-			let _ = this.practical_manager.practicals.shift()
-			if (_ !== this) {
-				console.log("AAAAAHHHHHHH!")
-			}
-			return
-		} else {
-			for (let i = 0; i < this.practical_manager.practicals.length; i++) {
-				if (this.practical_manager.practicals[i] === this) {
-					this.practical_manager.practicals.splice(i, 1)
-				}
-			}
-		}
+		this.practical_manager.practicals.delete(this)
 	}
 	remove_frome_visible_list() {
 		this.check_and_repair_visible_list_number()
@@ -1038,14 +1059,14 @@ globalThis.Abstract_camera = class Abstract_camera extends base {
 		}
 	}
 	/**
-	 * @param {world} New_world the world this the object is in.
+	 * @param {world} The_Container the Container this the object is in.
 	 * @param {Vector2} New_location the location of the object.
 	 * @param {HTMLCanvasElement} ctx the Canvas used for drawing.
 	 * @param {Vector2} screen_size the size of the 'screen' or render area.
 	 * @param {Boolean} draw_on_timed_update an option for auto drawing on timed_update.
 	 */
-	constructor(New_world, New_location, ctx, draw_on_timed_update = false) {
-		super(New_world, New_location)
+	constructor(The_Container, New_location, ctx, draw_on_timed_update = false) {
+		super(The_Container, New_location)
 
 		this.ctx = ctx
 		this.draw_on_timed_update = draw_on_timed_update
@@ -1072,8 +1093,15 @@ globalThis.camera = class camera extends Abstract_camera {
 
 		var draw_element = (A_render_component, thing) => {
 
-			var x = thing.location.x
-			var y = thing.location.y
+			var x = thing.get_true_location().x
+			var y = thing.get_true_location().y
+
+			var my_x = me.get_true_location().x
+			var my_y = me.get_true_location().y
+
+			var offset_x = A_render_component.offset.x
+			var offset_y = A_render_component.offset.y
+
 			try {
 				thing.before_draw()
 			} catch (error) {
@@ -1090,18 +1118,18 @@ globalThis.camera = class camera extends Abstract_camera {
 						case colour_or_img.img:
 							ctx_context.drawImage(
 								A_render_component.img,
-								Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
-								Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y),
+								Math.round((x + offset_x - my_x) * b_size_x),
+								Math.round((y + offset_y - my_y) * b_size_y),
 								Math.round(b_size_x * A_render_component.shape.size.x),
 								Math.round(b_size_y * A_render_component.shape.size.y))// display img
 							break;
 						case colour_or_img.colour:
 							ctx_context.fillStyle = A_render_component.colour //select color
 							ctx_context.fillRect(
-								Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
-								Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y),
-								/*x * b_size_x - (me.location.x * b_size_x),
-								y * b_size_y - (me.location.y * b_size_y),*/
+								Math.round((x + offset_x - my_x) * b_size_x),
+								Math.round((y + offset_y - my_y) * b_size_y),
+								/*x * b_size_x - (my_x * b_size_x),
+								y * b_size_y - (my_y * b_size_y),*/
 								Math.round(b_size_x * A_render_component.shape.size.x),
 								Math.round(b_size_y * A_render_component.shape.size.y)) //fill color
 							break;
@@ -1122,21 +1150,21 @@ globalThis.camera = class camera extends Abstract_camera {
 					ctx_context.textAlign = A_render_component.shape.textAlign
 					ctx_context.fillText(
 						A_render_component.shape.text,
-						Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
+						Math.round((x + offset_x - my_x) * b_size_x),
 						Math.round(
-							(y + A_render_component.offset.y - me.location.y) * b_size_y),
+							(y + offset_y - my_y) * b_size_y),
 					)
 					break
 				case line:
 					ctx_context.fillStyle = A_render_component.colour //select color
 					ctx_context.beginPath()
 					ctx_context.moveTo(
-						Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
-						Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y)
+						Math.round((x + offset_x - my_x) * b_size_x),
+						Math.round((y + offset_y - my_y) * b_size_y)
 					)
 					ctx_context.lineTo(
-						Math.round((x + A_render_component.offset.x - me.location.x + A_render_component.shape.vector.x) * b_size_x),
-						Math.round((y + A_render_component.offset.y - me.location.y + A_render_component.shape.vector.y) * b_size_y)
+						Math.round((x + offset_x - my_x + A_render_component.shape.vector.x) * b_size_x),
+						Math.round((y + offset_y - my_y + A_render_component.shape.vector.y) * b_size_y)
 					)
 					ctx_context.closePath();
 					ctx_context.stroke();
@@ -1145,13 +1173,13 @@ globalThis.camera = class camera extends Abstract_camera {
 					ctx_context.fillStyle = A_render_component.colour //select color
 					ctx_context.beginPath()
 					ctx_context.moveTo(
-						Math.round((x + A_render_component.offset.x - me.location.x) * b_size_x),
-						Math.round((y + A_render_component.offset.y - me.location.y) * b_size_y)
+						Math.round((x + offset_x - my_x) * b_size_x),
+						Math.round((y + offset_y - my_y) * b_size_y)
 					)
 					for (let i = 0; i < A_render_component.shape.points.length; i++) {
 						ctx_context.lineTo(
-							Math.round((x + A_render_component.offset.x - me.location.x + A_render_component.shape.points[i].x) * b_size_x),
-							Math.round((y + A_render_component.offset.y - me.location.y + A_render_component.shape.points[i].y) * b_size_y)
+							Math.round((x + offset_x - my_x + A_render_component.shape.points[i].x) * b_size_x),
+							Math.round((y + offset_y - my_y + A_render_component.shape.points[i].y) * b_size_y)
 						)
 					}
 					if (A_render_component.shape.fill) {
@@ -1169,24 +1197,23 @@ globalThis.camera = class camera extends Abstract_camera {
 
 		}
 
-		this.this_world.objects.forEach(function (c_block) {
-			if (c_block.visible != undefined) {
-				//console.log(c_block.visible)
-				c_block.visible.forEach((A_render_component) => {
-					draw_element(A_render_component, c_block)
+		this.Containing_World.All_objects.forEach((element) => {
+			if (element.visible !== undefined) {
+				element.visible.forEach((A_render_component) => {
+					draw_element(A_render_component, element)
 				})
 			}
 		})
 	}
 	/**
-	 * @param {world} New_world the world this the object is in.
+	 * @param {world} The_Container the Container this the object is in.
 	 * @param {Vector2} New_location the location of the object.
 	 * @param {HTMLCanvasElement} ctx the Canvas used for drawing.
 	 * @param {Vector2} screen_size the size of the 'screen' or render area.
 	 * @param {Boolean} draw_on_timed_update an option for auto drawing on timed_update.
 	 */
-	constructor(New_world, New_location, ctx, screen_size, draw_on_timed_update = false) {
-		super(New_world, New_location, ctx, draw_on_timed_update)
+	constructor(The_Container, New_location, ctx, screen_size, draw_on_timed_update = false) {
+		super(The_Container, New_location, ctx, draw_on_timed_update)
 
 		this.screen_size = screen_size
 	}
@@ -1236,7 +1263,7 @@ globalThis.check_out_of_world = (location, The_world) => {
  */
 globalThis.check_is_in_solid = (location, The_world, self_) => {
 	is_in_solid = false
-	The_world.get_at_location(location, self_).forEach(function (Thing) {
+	The_world.get_at_location(location, self_).forEach((Thing) => {
 		if (Thing.physics != undefined) {
 			is_in_solid = Thing.physics.solid || is_in_solid
 		}
