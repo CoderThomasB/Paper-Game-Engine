@@ -1,7 +1,7 @@
 # The Paper Game-Engine
 ## This is an unfinished Game Engine!
 
-Paper is a basic game engine designed for grid-based games
+Paper is not ready for use. It is full of bugs and is not vary organized
 
 ### implementation
 #### single-player
