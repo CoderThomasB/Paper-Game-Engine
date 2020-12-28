@@ -10,3 +10,5 @@ improve multiplayer performers by
 	Need to have a toJSON on objects because JSON.stringify isn't good at its job
 
 improve the documentation - a lot!
+
+Add 3D!

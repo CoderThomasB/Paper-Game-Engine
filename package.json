@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "node main.js && node 'Multi-Player/Test.js'",
+    "test": "node Test.js",
     "install": "npm install cors crypto express uuid",
     "uninstall": "npm remove cors crypto express uuid"
   },

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+	<canvas id="match" style="width: 500px; border: 1px solid; margin: auto; float: right;" width="500"
+		height="500"></canvas>
+	<script type="text/javascript" src="./Build/2D.js"></script>
+	<script>
+		class Custom_Practical extends Paper.Base_Practical {
+			/**
+			 * 
+			 * @param {base_practical} practical_Type 
+			 * @param {render_component[]} visible_list 
+			 * @param {Number} creation_interval
+			 */
+			constructor(visible_list, Practical_Manager) {
+				super(visible_list, Practical_Manager)
+
+				this.Velocity = new Paper.Vector2(Math.random() - 0.5, 1) // meshed in units per second
+				this.Velocity.normalize().multiplyScalar(2)
+
+				this.Max_Existence_Time = 4000
+
+				this.Attached_Render_Component.colour = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
+			}
+		}
+
+		class Test extends Paper.Visible {
+			keyframe_animation() {
+				// these animations are vary exaggerated you would want to use apply_animation not animatable render component because it dons not change the object location
+
+				var x_min = 1
+				var y_min = 1
+				var x_max = 9
+				var y_max = 9
+				var a = new Paper.Animation([
+					new Paper.Keyframe(0, "offset.x", x_min, Paper.Keyframe_Types.liner),
+					new Paper.Keyframe(0, "offset.y", y_min, Paper.Keyframe_Types.liner),
+
+					new Paper.Keyframe(250, "offset.x", x_max, Paper.Keyframe_Types.liner),
+					new Paper.Keyframe(250, "offset.y", y_min, Paper.Keyframe_Types.liner),
+
+					new Paper.Keyframe(500, "offset.x", x_max, Paper.Keyframe_Types.liner),
+					new Paper.Keyframe(500, "offset.y", y_max, Paper.Keyframe_Types.liner),
+
+					new Paper.Keyframe(750, "offset.x", x_min, Paper.Keyframe_Types.liner),
+					new Paper.Keyframe(750, "offset.y", y_max, Paper.Keyframe_Types.liner),
+
+					new Paper.Keyframe(1000, "offset.x", x_min, Paper.Keyframe_Types.liner),
+					new Paper.Keyframe(1000, "offset.y", y_min, Paper.Keyframe_Types.liner),
+				], 0, 1000)
+				this.location.x = 0
+				this.location.y = 0
+				this.visible[0] = new Paper.Animatable_Keyframe_Render_Component(new Paper.Rectangle(new Paper.Vector2(1, 1)), "#36fffc", a)
+				this.visible[0].play()
+			}
+			function_animation() {
+				// these animations are vary exaggerated you would want to use apply_animation not animatable render component because it dons not change the object location
+				var a = (the_render_component) => {
+					let size = 2
+					the_render_component.offset.x = size * Math.sin((the_render_component.now / the_render_component.end) * Math.PI * 2 * 2)
+					the_render_component.offset.y = size * Math.cos((the_render_component.now / the_render_component.end) * Math.PI * 2 * 2)
+				}
+				var stop = () => { this.now = this.start }
+				this.visible[0] = new Paper.Animatable_Function_Render_Component(new Paper.Rectangle(new Paper.Vector2(1, 1)), "#36fffc", a, 0, 2000)
+				this.visible[0].play()
+				this.location.x = 5
+				this.location.y = 5
+			}
+			practicals(creation_interval = 1) {
+				if (this.practical_emitter !== undefined) {
+					throw new Error("Practical Emitter is already defined and trying to add another would be a bad idea!")
+				}
+				this.location.x = 5
+				this.location.y = 0
+				this.visible[0] = new Paper.Render_Component(new Paper.Rectangle(new Paper.Vector2(1, 1)), "hsl(0, 0%, 80%)")
+				this.practical_emitter = new Paper.Practical_Emitter(Custom_Practical, this.visible, creation_interval)
+			}
+		}
+
+		The_world = new Paper.World()
+		The_camera = new Paper.Camera(The_world, new Paper.Vector2(0, 0), document.getElementsByTagName("canvas")[0], new Paper.Vector2(11, 11))
+
+		The_Test = new Test(The_world, new Paper.Vector2(1, 1))
+
+		function Draw() {
+			requestAnimationFrame(Draw)
+			The_camera.draw()
+		}
+		Draw()
+
+		async function Test_All(){
+			The_Test.function_animation()
+			await new Promise(r => setTimeout(r, 3000));
+			The_Test.keyframe_animation()
+			await new Promise(r => setTimeout(r, 2000));
+			The_Test.practicals()
+			await new Promise(r => setTimeout(r, 5000));
+			return "Passed"
+		}
+	</script>
+</body>
+
+</html>
