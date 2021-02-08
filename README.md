@@ -1,5 +1,5 @@
 # The Paper Game-Engine
-## This is an unfinished Game Engine!
+## This software is now deprercated do not use.
 
 Paper is not ready for use. It is full of bugs and is not vary organized
 
